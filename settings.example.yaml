@@ -1,0 +1,34 @@
+# sshagent ca example settings file
+
+# certificate validity period in minutes periods of more than 24 hours are
+# not permitted by this implementation
+validity: 180
+
+# organisation name, used in certificate identifer (which shows in
+# /var/log/auth.log on debian derivate hosts authorising user certificates; also
+# shows in `ssh-agent -l` on user hosts
+organisation: acmeinc
+
+# banner, used to greet connecting users
+banner: |
+    acmeinc ssh user certificate service
+
+# extensions, certificate "allow" extensions as set out in "Extensions" at
+# https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
+# these set the permissions given to users connecting to remote servers
+# whose connections are authorised by this service.
+extensions:
+    # "no-presence-required": "", // only U2F/Fido, not supported here
+    permit-agent-forwarding: ""
+    permit-port-forwarding: ""
+    permit-pty: ""
+    # permit-X11-forwarding: ""
+    # permit-user-rc: ""
+
+# principals, the usernames for which this certificate is valid. note that
+# zero-length principals are valid for *any* username (and is not advisable).
+principals:
+    - root
+    - web
+    
+

@@ -1,0 +1,8 @@
+.DS_Store
+*.swp
+*.swo
+ex/*
+tags
+main
+sshagentca
+
