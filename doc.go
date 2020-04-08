@@ -38,7 +38,7 @@ Please refer to the specification at PROTOCOL.certkeys at
 https://www.openssh.com/specs.html and the related go documentation at
 https://godoc.org/golang.org/x/crypto/ssh.
 
-05 April 2020 : version 0.0.1-alpha.
+version 0.0.2-alpha : 08 April 2020.
 
 Details
 

@@ -10,9 +10,10 @@ import (
 	"os"
 )
 
+const VERSION = "0.0.2-alpha"
 const usage = `<options> <yamlfile>
 
-SSH Agent CA
+SSH Agent CA version %s
 
 A proof-of-concept SSH server forwarded agent certificate authority
 
@@ -27,7 +28,7 @@ func main() {
 
 	var options util.Options
 	var parser = flags.NewParser(&options, flags.Default)
-	parser.Usage = usage
+	parser.Usage = fmt.Sprintf(usage, VERSION)
 
 	if _, err := parser.Parse(); err != nil {
 		os.Exit(1)

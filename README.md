@@ -1,6 +1,6 @@
 # sshagentca
 
-version 0.0.1-alpha 03 April 2020
+version 0.0.2-alpha : 08 April 2020
 
 A proof-of-concept project to add ssh user certificates to forwarded ssh
 agents using go's ssh packages.
