@@ -53,7 +53,7 @@ func addCertToAgent(agentC agent.ExtendedAgent, caKey ssh.Signer, username strin
 	err = agentC.Add(agent.AddedKey{
 		PrivateKey:   privKey,
 		Certificate:  cert,
-		LifetimeSecs: 300,
+		LifetimeSecs: settings.Validity,
 		Comment:      identifier,
 	})
 	if err != nil {
