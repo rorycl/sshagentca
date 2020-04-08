@@ -22,7 +22,7 @@ func TestSettingsParse2(t *testing.T) {
 		t.Errorf("Could not parse yaml file %v", err)
 	}
 
-	settings.Validity = -1
+	settings.Validity = 0
 	err = settings.Validate()
 	t.Logf("Error (expected): %s", err)
 	if err == nil {

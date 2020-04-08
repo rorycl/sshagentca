@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 )
 
-const maxmins int = 24 * 60 // limit max validity to 24 hours
+const maxmins uint32 = 24 * 60 // limit max validity to 24 hours
 
 // Restrict the certificate extensions to those commonly supported as
 // defined at https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
@@ -23,7 +23,7 @@ var permittedExtensions = map[string]string{
 }
 
 type Settings struct {
-	Validity     int               `yaml:"validity"`
+	Validity     uint32            `yaml:"validity"`
 	Organisation string            `yaml:"organisation"`
 	Banner       string            `yaml:"banner"`
 	Extensions   map[string]string `yaml:"extensions,flow"`
