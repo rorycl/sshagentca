@@ -34,6 +34,10 @@ Example client usage:
 	# the agent which now contains the signed certificate
 	ssh root@remoteserver -A
 
+Certificates from sshagentca can be conveniently used with pam-ussh (see
+https://github.com/uber/pam-ussh) to control sudo privileges on suitably
+configured servers.
+
 Please refer to the specification at PROTOCOL.certkeys at
 https://www.openssh.com/specs.html and the related go documentation at
 https://godoc.org/golang.org/x/crypto/ssh.
