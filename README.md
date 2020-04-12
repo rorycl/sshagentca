@@ -1,6 +1,6 @@
 # sshagentca
 
-version 0.0.2-alpha : 08 April 2020
+version 0.0.3-beta : 12 April 2020
 
 A proof-of-concept project to add ssh user certificates to forwarded ssh
 agents using go's ssh packages.
@@ -46,14 +46,16 @@ private key, with password protected private keys. The server will
 prompt for passwords on startup.
 
 The server requires an `authorized_keys` file with at least one valid
-entry.
+entry. Each entry also requires per-key `user_principals` settings in
+the settings yaml file.
 
 The server will run on the specified IP address and port, by default
 0.0.0.0:2222.
 
-Settings regarding certificate settings such as the validity period,
-organisation name and prompt received by the client are set out in the
-settings yaml file.
+Settings including certificate settings such as the validity period,
+organisation name and the prompt received by the client (together with
+the user_principals settings noted above) are set out in the settings
+yaml file.
 
 If the server runs successfully, it will respond to ssh connections that
 have a public key listed in `authorized_keys` and which have a forwarded
@@ -74,8 +76,9 @@ there is no support presently for customising *critical options*, and
 only the standard *extensions*, such as `permit-agent-forwarding`,
 `permit-port-forwarding` and `permit-pty` are permitted.
 
-The settings for `valid principals`, in this case user names, are set by
-the global option in the settings yaml file.
+Each certificate's principals settings are taken from the principals set
+out in the user_principals settings for the connecting client public
+key.
 
 The `valid after` timestamp is set according to the `duration` settings
 parameter, specified in minutes.
