@@ -1,7 +1,8 @@
-# sshagent ca example settings file
+# sshagentca example settings file
 
 # certificate validity period in minutes periods of more than 24 hours are
-# not permitted by this implementation
+# not permitted by this implementation. certificates with the 'forever'
+# validity string are also not supported.
 validity: 180
 
 # organisation name, used in certificate identifer (which shows in
@@ -25,10 +26,29 @@ extensions:
     # permit-X11-forwarding: ""
     # permit-user-rc: ""
 
-# principals, the usernames for which this certificate is valid. note that
-# zero-length principals are valid for *any* username (and is not advisable).
-principals:
-    - root
-    - web
+# user_principals, a list of configuration blocks by user, with name,
+# ssh key fingerprint and the principals to be inserted in the
+# certificate. To be valid, the fingerprints must exist in the
+# authorized_keys file provided to the program.
+# This structure can also be used to allow someone to have two key
+# registrations to receive different principal assignments
+# Note that zero-length principals are valid for *any* username (and are
+# therefore not support). Fingerprints are ssh key sha256 hashes
+# fingerprints may be listed by ssh-keygen -l -f <filename>
+user_principals:
+    -
+        name: jane
+        fingerprint: SHA256:R9cdULU8AvYJxyqX6Kws6Rgl+cjHD70zGCbaxFRRDi8
+        principals:
+            - web
+            - database
+            - root
+
+    -
+        name: john
+        fingerprint: SHA256:Ar7p/R9HO/Dwl5LtA3bZpRvHBOvKLkAtHtJyTDUOLqg
+        principals:
+            - web
+            - database
     
 

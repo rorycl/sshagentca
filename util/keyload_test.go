@@ -2,7 +2,6 @@ package util
 
 import (
 	"fmt"
-	"github.com/rorycl/sshagentca/util"
 	"io/ioutil"
 	"os"
 	"os/exec"

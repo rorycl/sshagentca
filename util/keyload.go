@@ -62,7 +62,7 @@ func LoadPublicKey(filename string) (ssh.PublicKey, error) {
 	return pubKey, nil
 }
 
-// load authorized_keys
+// load authorized_keys from file
 func LoadAuthorizedKeys(filename string) (map[string]bool, error) {
 
 	// record the found authorized keys
