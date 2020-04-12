@@ -46,12 +46,12 @@ func TestLoadRSAKeys(t *testing.T) {
 		fmt.Printf("out %s", out)
 	}
 
-	_, err = util.LoadPrivateKeyWithPassword(tname, password)
+	_, err = LoadPrivateKeyWithPassword(tname, password)
 	if err != nil {
 		t.Errorf("could not read private key with password: %s", err)
 	}
 
-	_, err = util.LoadPublicKey(pubkey)
+	_, err = LoadPublicKey(pubkey)
 	if err != nil {
 		t.Errorf("could not read public key : %s", err)
 	}
@@ -90,12 +90,12 @@ func TestLoadECDSAKeys(t *testing.T) {
 		fmt.Printf("out %s", out)
 	}
 
-	_, err = util.LoadPrivateKeyWithPassword(tname, password)
+	_, err = LoadPrivateKeyWithPassword(tname, password)
 	if err != nil {
 		t.Errorf("could not read private key with password: %s", err)
 	}
 
-	_, err = util.LoadPublicKey(pubkey)
+	_, err = LoadPublicKey(pubkey)
 	if err != nil {
 		t.Errorf("could not read public key : %s", err)
 	}
@@ -123,7 +123,7 @@ func TestAuthorizedKeysEmpty(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = util.LoadAuthorizedKeys(af.Name())
+	_, err = LoadAuthorizedKeys(af.Name())
 	// should error (empty authorized_keys)
 	if err == nil {
 		t.Error(af)
@@ -138,7 +138,7 @@ func TestAuthorizedKeysOne(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	authorized_keys, err := util.LoadAuthorizedKeys(af.Name())
+	authorized_keys, err := LoadAuthorizedKeys(af.Name())
 	if len(authorized_keys) != 1 {
 		t.Error("number of authorized keys should be one")
 	}
@@ -153,7 +153,7 @@ ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIfis9M2
 	if err != nil {
 		t.Error(err)
 	}
-	authorized_keys, err := util.LoadAuthorizedKeys(af.Name())
+	authorized_keys, err := LoadAuthorizedKeys(af.Name())
 	if len(authorized_keys) != 2 {
 		t.Error("number of authorized keys should be two")
 	}
