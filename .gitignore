@@ -1,3 +1,4 @@
+# sshagentca gitignore
 .DS_Store
 *.swp
 *.swo
