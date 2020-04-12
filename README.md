@@ -11,16 +11,20 @@ Running the server:
 
     sshagentca -h
     sshagentca -pvt <privatekey> -ca <caprivatekey> -a <authorized_keys>
-                -i <ipaddress> -p <port> settings.yaml
+               [-i <ipaddress>] [-p <port>] settings.yaml
 
 Example client usage:
 
-    source $(ssh-agent)
+    # start an ssh agent and add a key
+    ssh-agent > ~/.ssh/agent.env
+    source ~/.ssh/agent.env
     ssh-add ~/.ssh/id_test
     <enter password>
 
-    # assuming the public key to id_test is in authorized_keys on the server
-    # assuming sshagentca is running on 10.0.1.99; important to forward the agent
+    # assuming the public key to id_test is in authorized_keys on the
+    # sshagentca server, and the fingerprint, username and principals
+    # are set out in the settings.yaml file and sshagentca is running on
+    # 10.0.1.99: (it is important to forward the agent)
     ssh -p 2222 10.0.1.99 -A
 
     > acmecorp ssh user certificate service
@@ -32,8 +36,8 @@ Example client usage:
 
     # now connect to remote server which has the ca public key and
     # principals files configured, remembering to specify "-A" to forward
-    # the agent which now contains the signed certificate
-    ssh root@remoteserver -A
+    # the agent if needed, for example for sudo authentication, if configured
+    ssh userthatcansudo@remoteserver -A
 
 Certificates from `sshagentca` can be conveniently used with
 [pam-ussh](https://github.com/uber/pam-ussh) to control sudo privileges
@@ -56,10 +60,10 @@ the settings yaml file.
 The server will run on the specified IP address and port, by default
 0.0.0.0:2222.
 
-Settings including certificate settings such as the validity period,
-organisation name and the prompt received by the client (together with
-the user_principals settings noted above) are set out in the settings
-yaml file.
+Settings are configured in the settings yaml file and include the
+certificate settings such as the validity period and organisation name,
+the prompt received by the client and the `user_principals` settings
+noted above.
 
 If the server runs successfully, it will respond to ssh connections that
 have a public key listed in `authorized_keys` and which have a forwarded
@@ -68,7 +72,7 @@ forwarded agent which is signed by `caprivatekey` with the parameters
 set out in `settings.yaml` and restrictions as noted below.
 
 The inserted certificate is generated from an ECDSA key pair with a
-P-384 curve for fast key generation. 
+P-384 curve for fast key generation.
 
 ## Certificate Restrictions
 
@@ -81,8 +85,8 @@ only the standard *extensions*, such as `permit-agent-forwarding`,
 `permit-port-forwarding` and `permit-pty` are permitted.
 
 Each certificate's principals settings are taken from the principals set
-out in the user_principals settings for the connecting client public
-key.
+out for the specific connecting client public key from the
+`user_principals` settings.
 
 The `valid after` timestamp is set according to the `duration` settings
 parameter, specified in minutes.
@@ -125,4 +129,4 @@ from him and others on the ssh mailing list.
 
 This project is licensed under the [MIT Licence](LICENCE).
 
-Rory Campbell-Lange 06 April 2020
+Rory Campbell-Lange 12 April 2020
