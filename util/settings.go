@@ -3,8 +3,9 @@ package util
 import (
 	"errors"
 	"fmt"
-	yaml "gopkg.in/yaml.v3"
+	"golang.org/x/crypto/ssh"
 	"io/ioutil"
+	yaml "gopkg.in/yaml.v3"
 )
 
 const maxmins uint32 = 24 * 60 // limit max validity to 24 hours
@@ -23,26 +24,29 @@ var permittedExtensions = map[string]string{
 }
 
 type UserPrincipals struct {
-	Name        string   `yaml:"name"`
+	Name        string        `yaml:"name"`
 	// ssh.FingerprintSHA256
-	Fingerprint string   `yaml:"fingerprint"`
-	Principals  []string `yaml:"principals,flow"`
+	Fingerprint string        `yaml:"fingerprint"`
+	Principals  []string      `yaml:"principals,flow"`
+	PublicKey   ssh.PublicKey
 }
 
 type Settings struct {
-	Validity           uint32                    `yaml:"validity"`
-	Organisation       string                    `yaml:"organisation"`
-	Banner             string                    `yaml:"banner"`
-	Extensions         map[string]string         `yaml:"extensions,flow"`
-	Users              []UserPrincipals          `yaml:"user_principals"`
-    usersByFingerprint map[string]UserPrincipals
+	Validity           uint32                     `yaml:"validity"`
+	Organisation       string                     `yaml:"organisation"`
+	Banner             string                     `yaml:"banner"`
+	Extensions         map[string]string          `yaml:"extensions,flow"`
+	Users              []*UserPrincipals          `yaml:"user_principals"`
+    usersByFingerprint map[string]*UserPrincipals
 }
 
 
 // Load a settings yaml file into a Settings struct
-func SettingsLoad(filepath string) (s Settings, err error) {
+func SettingsLoad(yamlFilePath string, authorizedKeysPath string) (Settings, error) {
 
-	filer, err := ioutil.ReadFile(filepath)
+	var s = Settings{}
+
+	filer, err := ioutil.ReadFile(yamlFilePath)
 	if err != nil {
 		return s, err
 	}
@@ -56,12 +60,28 @@ func SettingsLoad(filepath string) (s Settings, err error) {
 		return s, errors.New("no valid users found in yaml file")
 	}
 
-	err = s.Validate()
+	// build map of keys by fingerprint
+	err = s.buildFPMap()
 	if err != nil {
 		return s, err
 	}
 
-	err = s.buildFPMap()
+	// match fingerprints to authorized_keys file
+	authorized_keys, err := LoadAuthorizedKeys(authorizedKeysPath)
+	if err != nil {
+		return s, err
+	}
+	for key, _ := range(authorized_keys) {
+		afp := string(ssh.FingerprintSHA256(key))
+		user, ok := s.usersByFingerprint[afp]
+		if !ok {
+			return s, errors.New(fmt.Sprintf("fingerprint for key %s in authorized keys not found", afp))
+		}
+		user.PublicKey = key
+	}
+
+	// run validation
+	err = s.validate()
 	if err != nil {
 		return s, err
 	}
@@ -70,8 +90,8 @@ func SettingsLoad(filepath string) (s Settings, err error) {
 }
 
 // Extract a user's UserPrincipals struct by fingerprint
-func (s *Settings) UserByFingerprint(fp string) (UserPrincipals, error) {
-	var up = UserPrincipals{}
+func (s *Settings) UserByFingerprint(fp string) (*UserPrincipals, error) {
+	var up = &UserPrincipals{}
 	up, ok := s.usersByFingerprint[fp]
 	if !ok {
 		return up, errors.New(fmt.Sprintf("user for fingerprint %s not found", fp))
@@ -81,17 +101,21 @@ func (s *Settings) UserByFingerprint(fp string) (UserPrincipals, error) {
 
 // build map by fingerprint
 func (s *Settings) buildFPMap () error {
-	s.usersByFingerprint = map[string]UserPrincipals{}
+	s.usersByFingerprint = map[string]*UserPrincipals{}
 	for _, u := range s.Users {
-		if u.Fingerprint != "" {
-			s.usersByFingerprint[u.Fingerprint] = u
+		if u.Fingerprint == "" {
+			continue
 		}
+		if _, ok := s.usersByFingerprint[u.Fingerprint]; ok {
+			return errors.New(fmt.Sprintf("duplicate entry for key %s", u.Fingerprint))
+		}
+		s.usersByFingerprint[u.Fingerprint] = u
 	}
 	return nil
 }
 
 // Validate the certificate extensions, validity period and user records
-func (s *Settings) Validate() error {
+func (s *Settings) validate() error {
 
 	// check validity period
 	if !(0 < s.Validity) {
@@ -121,6 +145,17 @@ func (s *Settings) Validate() error {
 			return errors.New(fmt.Sprintf("user %s fingerprint does not start with SHA256:", v.Name))
 		} else if len(v.Fingerprint) != 50 {
 			return errors.New(fmt.Sprintf("user %s fingerprint unexpected length", v.Name))
+		}
+	}
+
+	// check all users have a public keys
+	for fp, user := range(s.usersByFingerprint) {
+		if user.PublicKey == nil {
+			return errors.New(fmt.Sprintf("user %s has empty public key", user.Name))
+		}
+		// some mangling has happened to a key?
+		if fp != string(ssh.FingerprintSHA256(user.PublicKey)) {
+			return errors.New(fmt.Sprintf("user %s public key mismatch", user.Name))
 		}
 	}
 

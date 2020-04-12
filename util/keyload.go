@@ -63,10 +63,10 @@ func LoadPublicKey(filename string) (ssh.PublicKey, error) {
 }
 
 // load authorized_keys from file
-func LoadAuthorizedKeys(filename string) (map[string]bool, error) {
+func LoadAuthorizedKeys(filename string) (map[ssh.PublicKey]bool, error) {
 
 	// record the found authorized keys
-	akeys := map[string]bool{}
+	akeys := map[ssh.PublicKey]bool{}
 
 	// from https://godoc.org/golang.org/x/crypto/ssh#ex-NewServerConn
 	authorizedKeysBytes, err := ioutil.ReadFile(filename)
@@ -82,7 +82,7 @@ func LoadAuthorizedKeys(filename string) (map[string]bool, error) {
 		if err != nil {
 			return akeys, err
 		}
-		akeys[string(pubKey.Marshal())] = true
+		akeys[pubKey] = true
 		authorizedKeysBytes = rest
 	}
 	return akeys, nil
