@@ -1,8 +1,4 @@
-// The ssh server is drawn from the example in the ssh server docs at
-// https://godoc.org/golang.org/x/crypto/ssh#ServerConn and the Scalingo
-// blog posting at
-// https://scalingo.com/blog/writing-a-replacement-to-openssh-using-go-22.html
-package ssh
+package main
 
 import (
 	"fmt"
@@ -16,20 +12,25 @@ import (
 	"time"
 )
 
-// Serve the SSH Agent Forwarding Certificate Authority Server
-// The server requires connections to have public keys registered in the
-// AuthorizedKeys map.
+// Serve the SSH Agent Forwarding Certificate Authority Server. The
+// server requires connections to have public keys registered in the
+// authorized keys file and user_principals fingerprints defined in
+// settings.
 // Two goroutines, addCertToAgent and handleConnections coordinate to
 // add a certificate to the connecting user's ssh connection and to
-// print information to their terminal
-func Serve(options util.Options, privateKey ssh.Signer, caKey ssh.Signer,
-	authorizedKeys map[string]bool, settings util.Settings) {
+// print information to their terminal.
+// The ssh server is drawn from the example in the ssh server docs at
+// https://godoc.org/golang.org/x/crypto/ssh#ServerConn and the Scalingo
+// blog posting at
+// https://scalingo.com/blog/writing-a-replacement-to-openssh-using-go-22.html
+func Serve(options util.Options, privateKey ssh.Signer, caKey ssh.Signer, settings util.Settings) {
 
 	// configure server
 	sshConfig := &ssh.ServerConfig{
 		// public key callback taken directly from ssh.ServerConn example
 		PublicKeyCallback: func(c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) {
-			if authorizedKeys[string(pubKey.Marshal())] {
+			_, err := settings.UserByFingerprint(ssh.FingerprintSHA256(pubKey))
+			if err == nil {
 				return &ssh.Permissions{
 					Extensions: map[string]string{
 						"pubkey-fp": ssh.FingerprintSHA256(pubKey),
@@ -66,9 +67,16 @@ func Serve(options util.Options, privateKey ssh.Signer, caKey ssh.Signer,
 			continue
 		}
 
+		// extract user
+		user, err := settings.UserByFingerprint(sshConn.Permissions.Extensions["pubkey-fp"])
+		if err != nil {
+			log.Printf("verification error from unknown user %s", sshConn.Permissions.Extensions["pubkey-fp"])
+			continue
+		}
+
 		// report remote address, user and key
 		log.Printf("new ssh connection from %s (%s)", sshConn.RemoteAddr(), sshConn.ClientVersion())
-		log.Printf("user %s logged in with key %s", sshConn.User(), sshConn.Permissions.Extensions["pubkey-fp"])
+		log.Printf("user %s logged in with key %s", user.Name, user.Fingerprint)
 
 		// https://lists.gt.net/openssh/dev/72190
 		agentChan, reqs, err := sshConn.OpenChannel("auth-agent@openssh.com", nil)
@@ -81,13 +89,13 @@ func Serve(options util.Options, privateKey ssh.Signer, caKey ssh.Signer,
 
 		// add certificate to agent
 		certErr := make(chan error)
-		go addCertToAgent(agentConn, caKey, sshConn.User(), settings, certErr)
+		go addCertToAgent(agentConn, caKey, user, settings, certErr)
 
 		// discard incoming out-of-band requests
 		go ssh.DiscardRequests(reqs)
 
 		// accept all channels
-		go handleChannels(chans, settings.Banner, sshConn, certErr)
+		go handleChannels(chans, user, settings, sshConn, certErr)
 	}
 }
 
@@ -111,12 +119,11 @@ func chanCloser(c ssh.Channel, isError bool) {
 	}
 }
 
-// Service the incoming channel, providing a banner for client
-// information, the username and a certErr channel indicating when the
+// Service the incoming channel. The certErr channel indicates when the
 // certificate has finished generation
-func handleChannels(chans <-chan ssh.NewChannel, banner string, sshConn *ssh.ServerConn, certErr <-chan error) {
+func handleChannels(chans <-chan ssh.NewChannel, user *util.UserPrincipals,
+	settings util.Settings, sshConn *ssh.ServerConn, certErr <-chan error) {
 
-	username := sshConn.User()
 	defer sshConn.Close()
 
 	for thisChan := range chans {
@@ -142,8 +149,8 @@ func handleChannels(chans <-chan ssh.NewChannel, banner string, sshConn *ssh.Ser
 
 		// terminal
 		term := terminal.NewTerminal(ch, "")
-		termWriter(term, banner)
-		termWriter(term, fmt.Sprintf("welcome, %s", username))
+		termWriter(term, settings.Banner)
+		termWriter(term, fmt.Sprintf("welcome, %s", user.Name))
 
 		// wait for certificate to be done, let user know, then close
 		// the connection
@@ -166,10 +173,10 @@ func handleChannels(chans <-chan ssh.NewChannel, banner string, sshConn *ssh.Ser
 					break DONE
 				}
 			default:
-				time.Sleep(1 * time.Second)
+				time.Sleep(250 * time.Millisecond)
 			}
 		}
-		log.Println("Closing the connection")
+		log.Println("closing the connection")
 		sshConn.Close()
 		return
 	}
