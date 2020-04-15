@@ -3,7 +3,7 @@
 # certificate validity period in minutes periods of more than 24 hours are
 # not permitted by this implementation. certificates with the 'forever'
 # validity string are also not supported.
-validity: 180
+validity: 180 # 3 hours
 
 # organisation name, used in certificate identifer (which shows in
 # /var/log/auth.log on debian derivate hosts authorising user certificates; also
@@ -29,12 +29,13 @@ extensions:
 # user_principals, a list of configuration blocks by user, with name,
 # ssh key fingerprint and the principals to be inserted in the
 # certificate. To be valid, the fingerprints must exist in the
-# authorized_keys file provided to the program.
-# This structure can also be used to allow someone to have two key
-# registrations to receive different principal assignments
-# Note that zero-length principals are valid for *any* username (and are
-# therefore not support). Fingerprints are ssh key sha256 hashes
-# fingerprints may be listed by ssh-keygen -l -f <filename>
+# authorized_keys file provided to the program. This structure can also
+# be used to allow someone to have two key registrations to receive
+# different principal assignments Note that zero-length principals are
+# valid for *any* username (and are therefore not supported).
+# Fingerprints are ssh key sha256 hashes fingerprints which can be
+# listed by ssh-keygen -l -f <filename> on recent versions of
+# ssh-keygen.
 user_principals:
     -
         name: jane
