@@ -23,7 +23,7 @@ import (
 // https://godoc.org/golang.org/x/crypto/ssh#ServerConn and the Scalingo
 // blog posting at
 // https://scalingo.com/blog/writing-a-replacement-to-openssh-using-go-22.html
-func Serve(options util.Options, privateKey ssh.Signer, caKey ssh.Signer, settings util.Settings) {
+func Serve(options Options, privateKey ssh.Signer, caKey ssh.Signer, settings util.Settings) {
 
 	// configure server
 	sshConfig := &ssh.ServerConfig{
