@@ -1,6 +1,6 @@
 # sshagentca
 
-version 0.0.3-beta : 12 April 2020
+version 0.0.4-beta : 15 April 2020
 
 A proof-of-concept project to add ssh user certificates to forwarded ssh
 agents using go's ssh packages.
@@ -129,4 +129,4 @@ from him and others on the ssh mailing list.
 
 This project is licensed under the [MIT Licence](LICENCE).
 
-Rory Campbell-Lange 12 April 2020
+Rory Campbell-Lange 15 April 2020

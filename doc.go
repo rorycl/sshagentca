@@ -46,7 +46,7 @@ Please refer to the specification at PROTOCOL.certkeys at
 https://www.openssh.com/specs.html and the related go documentation at
 https://godoc.org/golang.org/x/crypto/ssh.
 
-version 0.0.3-beta : 12 April 2020
+version 0.0.4-beta : 15 April 2020
 
 Details
 
@@ -129,7 +129,7 @@ from him and others on the ssh mailing list.
 License
 
 This project is licensed under the MIT Licence.
-Rory Campbell-Lange 12 April 2020
+Rory Campbell-Lange 15 April 2020
 
 */
 package main
