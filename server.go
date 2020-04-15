@@ -15,10 +15,9 @@ import (
 // Serve the SSH Agent Forwarding Certificate Authority Server. The
 // server requires connections to have public keys registered in the
 // authorized keys file and user_principals fingerprints defined in
-// settings.
-// Two goroutines, addCertToAgent and handleConnections coordinate to
-// add a certificate to the connecting user's ssh connection and to
-// print information to their terminal.
+// settings. The handleConnections goroutine prints information to the
+// the client terminal and adds a certificate to the user's ssh
+// forwarded agent.
 // The ssh server is drawn from the example in the ssh server docs at
 // https://godoc.org/golang.org/x/crypto/ssh#ServerConn and the Scalingo
 // blog posting at
@@ -87,15 +86,11 @@ func Serve(options Options, privateKey ssh.Signer, caKey ssh.Signer, settings ut
 		}
 		agentConn := agent.NewClient(agentChan)
 
-		// add certificate to agent
-		certErr := make(chan error)
-		go addCertToAgent(agentConn, caKey, user, settings, certErr)
-
 		// discard incoming out-of-band requests
 		go ssh.DiscardRequests(reqs)
 
 		// accept all channels
-		go handleChannels(chans, user, settings, sshConn, certErr)
+		go handleChannels(chans, user, settings, sshConn, agentConn, caKey)
 	}
 }
 
@@ -122,7 +117,8 @@ func chanCloser(c ssh.Channel, isError bool) {
 // Service the incoming channel. The certErr channel indicates when the
 // certificate has finished generation
 func handleChannels(chans <-chan ssh.NewChannel, user *util.UserPrincipals,
-	settings util.Settings, sshConn *ssh.ServerConn, certErr <-chan error) {
+	settings util.Settings, sshConn *ssh.ServerConn, agentConn agent.ExtendedAgent,
+	caKey ssh.Signer) {
 
 	defer sshConn.Close()
 
@@ -136,7 +132,7 @@ func handleChannels(chans <-chan ssh.NewChannel, user *util.UserPrincipals,
 		ch, reqs, err := thisChan.Accept()
 		defer ch.Close()
 		if err != nil {
-			log.Println("fail to accept channel request", err)
+			log.Println("did not accept channel request", err)
 			return
 		}
 
@@ -152,30 +148,23 @@ func handleChannels(chans <-chan ssh.NewChannel, user *util.UserPrincipals,
 		termWriter(term, settings.Banner)
 		termWriter(term, fmt.Sprintf("welcome, %s", user.Name))
 
-		// wait for certificate to be done, let user know, then close
-		// the connection
-	DONE:
-		for {
-			select {
-			case err := <-certErr:
-				if err != nil {
-					log.Printf("certificate creation error %s\n", err)
-					termWriter(term, "certificate creation error")
-					termWriter(term, "goodbye\n")
-					chanCloser(ch, true)
-					break DONE
-				} else {
-					log.Printf("certificate creation and insertion in agent done\n")
-					termWriter(term, "certificate generation complete")
-					termWriter(term, "run 'ssh-add -l' to view")
-					termWriter(term, "goodbye\n")
-					chanCloser(ch, false)
-					break DONE
-				}
-			default:
-				time.Sleep(250 * time.Millisecond)
-			}
+
+		// add certificate to agent, let the user know, then close the
+		// connection
+		err = addCertToAgent(agentConn, caKey, user, settings)
+		if err != nil {
+			log.Printf("certificate creation error %s\n", err)
+			termWriter(term, "certificate creation error")
+			termWriter(term, "goodbye\n")
+			chanCloser(ch, true)
+		} else {
+			log.Printf("certificate creation and insertion in agent done\n")
+			termWriter(term, "certificate generation complete")
+			termWriter(term, "run 'ssh-add -l' to view")
+			termWriter(term, "goodbye\n")
+			chanCloser(ch, false)
 		}
+		time.Sleep(250 * time.Millisecond)
 		log.Println("closing the connection")
 		sshConn.Close()
 		return

@@ -13,19 +13,18 @@ import (
 )
 
 // Given an agent, CA private key, username and some settings, generate
-// an SSH certificate and insert it in the agent. The done chan sends a
-// signal to handleChannels that certificate generation is done
-func addCertToAgent(agentC agent.ExtendedAgent, caKey ssh.Signer, user *util.UserPrincipals, settings util.Settings, certErr chan<- error) {
+// an SSH certificate and insert it in the agent. 
+func addCertToAgent(agentC agent.ExtendedAgent, caKey ssh.Signer, user *util.UserPrincipals, settings util.Settings) error {
 
 	// generate a new private key for signing the certificate, and then
 	// derive the public key from it
 	privKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	if err != nil {
-		certErr <- fmt.Errorf("Could not generate cert private key %s", err)
+		return fmt.Errorf("Could not generate cert private key %s", err)
 	}
 	pubKey, err := ssh.NewPublicKey(&privKey.PublicKey)
 	if err != nil {
-		certErr <- fmt.Errorf("Could not generate cert public key %s", err)
+		return fmt.Errorf("Could not generate cert public key %s", err)
 	}
 
 	fromT := time.Now().UTC()
@@ -47,7 +46,7 @@ func addCertToAgent(agentC agent.ExtendedAgent, caKey ssh.Signer, user *util.Use
 		Permissions:     permissions,
 	}
 	if err := cert.SignCert(rand.Reader, caKey); err != nil {
-		certErr <- fmt.Errorf("cert signing error: %s", err)
+		return fmt.Errorf("cert signing error: %s", err)
 	}
 
 	err = agentC.Add(agent.AddedKey{
@@ -57,9 +56,9 @@ func addCertToAgent(agentC agent.ExtendedAgent, caKey ssh.Signer, user *util.Use
 		Comment:      identifier,
 	})
 	if err != nil {
-		certErr <- fmt.Errorf("cert signing error: %s", err)
+		return fmt.Errorf("cert signing error: %s", err)
 	}
 
 	log.Printf("completed making certificate for %s (fp %s) principals %s expiring %s", user.Name, user.Fingerprint, user.Principals, toT.Format(fmtT))
-	certErr <- nil
+	return nil
 }
