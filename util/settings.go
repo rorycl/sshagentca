@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/ssh"
-	"io/ioutil"
 	yaml "gopkg.in/yaml.v3"
+	"io/ioutil"
 )
 
 const maxmins uint32 = 24 * 60 // limit max validity to 24 hours
@@ -24,22 +24,21 @@ var permittedExtensions = map[string]string{
 }
 
 type UserPrincipals struct {
-	Name        string        `yaml:"name"`
+	Name string `yaml:"name"`
 	// ssh.FingerprintSHA256
-	Fingerprint string        `yaml:"fingerprint"`
-	Principals  []string      `yaml:"principals,flow"`
+	Fingerprint string   `yaml:"fingerprint"`
+	Principals  []string `yaml:"principals,flow"`
 	PublicKey   ssh.PublicKey
 }
 
 type Settings struct {
-	Validity           uint32                     `yaml:"validity"`
-	Organisation       string                     `yaml:"organisation"`
-	Banner             string                     `yaml:"banner"`
-	Extensions         map[string]string          `yaml:"extensions,flow"`
-	Users              []*UserPrincipals          `yaml:"user_principals"`
-    usersByFingerprint map[string]*UserPrincipals
+	Validity           uint32            `yaml:"validity"`
+	Organisation       string            `yaml:"organisation"`
+	Banner             string            `yaml:"banner"`
+	Extensions         map[string]string `yaml:"extensions,flow"`
+	Users              []*UserPrincipals `yaml:"user_principals"`
+	usersByFingerprint map[string]*UserPrincipals
 }
-
 
 // Load a settings yaml file into a Settings struct
 func SettingsLoad(yamlFilePath string, authorizedKeysPath string) (Settings, error) {
@@ -71,7 +70,7 @@ func SettingsLoad(yamlFilePath string, authorizedKeysPath string) (Settings, err
 	if err != nil {
 		return s, err
 	}
-	for key, _ := range(authorized_keys) {
+	for key, _ := range authorized_keys {
 		afp := string(ssh.FingerprintSHA256(key))
 		user, ok := s.usersByFingerprint[afp]
 		if !ok {
@@ -100,7 +99,7 @@ func (s *Settings) UserByFingerprint(fp string) (*UserPrincipals, error) {
 }
 
 // build map by fingerprint
-func (s *Settings) buildFPMap () error {
+func (s *Settings) buildFPMap() error {
 	s.usersByFingerprint = map[string]*UserPrincipals{}
 	for _, u := range s.Users {
 		if u.Fingerprint == "" {
@@ -149,7 +148,7 @@ func (s *Settings) validate() error {
 	}
 
 	// check all users have a public keys
-	for fp, user := range(s.usersByFingerprint) {
+	for fp, user := range s.usersByFingerprint {
 		if user.PublicKey == nil {
 			return errors.New(fmt.Sprintf("user %s has empty public key", user.Name))
 		}

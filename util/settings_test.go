@@ -1,11 +1,11 @@
 package util
 
 import (
-	"testing"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"golang.org/x/crypto/ssh"
+	"testing"
 )
 
 func TestSettingsParse(t *testing.T) {

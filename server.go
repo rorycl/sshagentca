@@ -148,7 +148,6 @@ func handleChannels(chans <-chan ssh.NewChannel, user *util.UserPrincipals,
 		termWriter(term, settings.Banner)
 		termWriter(term, fmt.Sprintf("welcome, %s", user.Name))
 
-
 		// add certificate to agent, let the user know, then close the
 		// connection
 		err = addCertToAgent(agentConn, caKey, user, settings)

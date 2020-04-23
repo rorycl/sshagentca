@@ -13,7 +13,7 @@ import (
 )
 
 // Given an agent, CA private key, username and some settings, generate
-// an SSH certificate and insert it in the agent. 
+// an SSH certificate and insert it in the agent.
 func addCertToAgent(agentC agent.ExtendedAgent, caKey ssh.Signer, user *util.UserPrincipals, settings util.Settings) error {
 
 	// generate a new private key for signing the certificate, and then

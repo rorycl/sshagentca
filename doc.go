@@ -120,7 +120,7 @@ specified in the AuthorizedPrincipalsFile, the certificate principals
 (set in the yaml file) and the user for the connecting ssh client.
 
 The use of principals to provide "zone" based access to servers is set out at
-https://engineering.fb.com/security/scalable-and-secure-access-with-ssh/ 
+https://engineering.fb.com/security/scalable-and-secure-access-with-ssh/
 
 Thanks
 
