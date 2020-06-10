@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 )
 
-// load a private key from file
+var ErrKeyPassphraseRequired = errors.New("the ssh key requires a passphrase")
+
+// load a private key from file (best not to use)
 func LoadPrivateKey(filename string) (ssh.Signer, error) {
 
 	fkey, err := ioutil.ReadFile(filename)
@@ -14,7 +16,12 @@ func LoadPrivateKey(filename string) (ssh.Signer, error) {
 		return nil, err
 	}
 	sig, err := ssh.ParsePrivateKey(fkey)
+
+	// https://go.googlesource.com/crypto/+/master/ssh/keys_test.go#209
 	if err != nil {
+		if err == err.(*ssh.PassphraseMissingError) {
+			return nil, ErrKeyPassphraseRequired
+		}
 		return nil, err
 	}
 	return sig, nil
@@ -34,14 +41,10 @@ func LoadPrivateKeyWithPassword(filename string, passphrase []byte) (ssh.Signer,
 	return sig, nil
 }
 
-// load a raw private key without password from file
-func LoadPrivateKeyRaw(filename string) (interface{}, error) {
+// load a private key with password from bytes
+func LoadPrivateKeyBytesWithPassword(keyBytes []byte, passphrase []byte) (ssh.Signer, error) {
 
-	fkey, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	sig, err := ssh.ParseRawPrivateKey(fkey)
+	sig, err := ssh.ParsePrivateKeyWithPassphrase(keyBytes, passphrase)
 	if err != nil {
 		return nil, err
 	}
@@ -56,6 +59,15 @@ func LoadPublicKey(filename string) (ssh.PublicKey, error) {
 		return nil, err
 	}
 	pubKey, _, _, _, err := ssh.ParseAuthorizedKey(fkey)
+	if err != nil {
+		return nil, err
+	}
+	return pubKey, nil
+}
+
+// load a public key from bytes
+func LoadPublicKeyBytes(key []byte) (ssh.PublicKey, error) {
+	pubKey, _, _, _, err := ssh.ParseAuthorizedKey(key)
 	if err != nil {
 		return nil, err
 	}

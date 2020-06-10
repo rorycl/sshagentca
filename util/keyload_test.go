@@ -18,6 +18,49 @@ func init() {
 
 var password = []byte("akdjfN57$")
 
+// test ssh rsa private key with no password
+func TestLoadRSAKeysNoPassword(t *testing.T) {
+
+	tmpfile, err := ioutil.TempFile("", "rsa")
+	if err != nil {
+		t.Error(err)
+	}
+	tname := tmpfile.Name()
+	// very crude
+	os.Remove(tname)
+	pubkey := tname + ".pub"
+
+	f := fmt.Sprintf("-f %s", tname)
+	fmt.Println(f)
+
+	out, err := exec.Command(
+		"ssh-keygen",
+		"-trsa",
+		"-b2048",
+		fmt.Sprintf("-f%s", tname),
+	).Output()
+	if err != nil {
+		t.Errorf("ssh-keygen failed %s", err)
+	} else {
+		fmt.Printf("out %s", out)
+	}
+
+	_, err = LoadPrivateKey(tname)
+	if err != nil {
+		t.Errorf("could not read private key without password: %s", err)
+	}
+
+	_, err = LoadPublicKey(pubkey)
+	if err != nil {
+		t.Errorf("could not read public key : %s", err)
+	}
+
+	// clean up
+	_ = os.Remove(tname)
+	_ = os.Remove(pubkey)
+
+}
+
 // test ssh rsa private key with password and public key reading
 func TestLoadRSAKeys(t *testing.T) {
 
@@ -54,6 +97,22 @@ func TestLoadRSAKeys(t *testing.T) {
 	_, err = LoadPublicKey(pubkey)
 	if err != nil {
 		t.Errorf("could not read public key : %s", err)
+	}
+
+	// read the privatekey to check via bytes method
+	fkey, err := ioutil.ReadFile(tname)
+	if err != nil {
+		t.Errorf("could not read private key for parsing: %s", err)
+	}
+	_, err = LoadPrivateKeyBytesWithPassword(fkey, password)
+	if err != nil {
+		t.Errorf("could not read private key via bytes: %s", err)
+	}
+
+	// try and read the key without a password, which should fail
+	_, err = LoadPrivateKey(tname)
+	if err != ErrKeyPassphraseRequired {
+		t.Errorf("Unexpected error %v", err)
 	}
 
 	// clean up
