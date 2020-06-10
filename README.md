@@ -1,30 +1,30 @@
 # sshagentca
 
-version 0.0.4-beta : 15 April 2020
+version 0.0.5-beta : 09 June 2020
 
-A proof-of-concept project to add ssh user certificates to forwarded ssh
-agents using go's ssh packages.
-
-This project is for testing purposes and has not been security audited.
+A server to add ssh user certificates to ssh forwarded agents.
 
 Running the server:
 
     sshagentca -h
-    sshagentca -pvt <privatekey> -ca <caprivatekey> -a <authorized_keys>
-               [-i <ipaddress>] [-p <port>] settings.yaml
+    sshagentca -t <privatekey> -c <caprivatekey> -i <ipaddress> -p <port>
+               <settings.yaml>
 
 Example client usage:
 
-    # start an ssh agent and add a key
+    # generate a new key pair, start an ssh agent and add a key
+	ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_test	
     ssh-agent > ~/.ssh/agent.env
     source ~/.ssh/agent.env
     ssh-add ~/.ssh/id_test
     <enter password>
 
-    # assuming the public key to id_test is in authorized_keys on the
-    # sshagentca server, and the fingerprint, username and principals
-    # are set out in the settings.yaml file and sshagentca is running on
-    # 10.0.1.99: (it is important to forward the agent)
+    # register ~/.ssh/id_test.pub in the sshagentca settings.yaml file
+    # make a new ssh keypair for the server private key
+    # make a new ssh keypair for the server certificate authority
+    # (the ca key must be password protected)
+    # ./sshagentca -t id_pvt -c id_ca -i 10.0.1.99 settings.yaml
+    # connect to sshagentca, remembering to forward the agent
     ssh -p 2222 10.0.1.99 -A
 
     > acmecorp ssh user certificate service
@@ -34,10 +34,11 @@ Example client usage:
     > run 'ssh-add -l' to view
     > goodbye
 
-    # now connect to remote server which has the ca public key and
-    # principals files configured, remembering to specify "-A" to forward
-    # the agent if needed, for example for sudo authentication, if configured
-    ssh userthatcansudo@remoteserver -A
+    # Put id_ca.pub in /etc/ssh/ on the remote server
+    # configure the remote server's sshd server with 
+    # TrustedUserCAKeys = id_ca.pub (from above)
+    # connect to the remote server
+    ssh user@remoteserver
 
 Certificates from `sshagentca` can be conveniently used with
 [pam-ussh](https://github.com/uber/pam-ussh) to control sudo privileges
@@ -50,33 +51,32 @@ https://godoc.org/golang.org/x/crypto/ssh.
 ## Details
 
 The server requires an ssh private key and ssh certificate authority
-private key, with password protected private keys. The server will
-prompt for passwords on startup.
+(CA) private key, with a password required for the CA key at least.
+The server will prompt for passwords on startup, or the environmental
+variables `SSHAGENTCA_PVT_KEY` and `SSHAGENTCA_CA_KEY` can be set.
 
-The server requires an `authorized_keys` file with at least one valid
-entry. Each entry also requires per-key `user_principals` settings in
-the settings yaml file.
+Configuration is done in the settings.yaml file and include
+certificate settings such as the validity period and organisation name,
+the prompt received by the client. Users are configured in the
+`user_principals` section, where each user is required to have a name,
+ssh public key and list of principals to be set out.
 
 The server will run on the specified IP address and port, by default
 0.0.0.0:2222.
 
-Settings are configured in the settings yaml file and include the
-certificate settings such as the validity period and organisation name,
-the prompt received by the client and the `user_principals` settings
-noted above.
-
 If the server runs successfully, it will respond to ssh connections that
-have a public key listed in `authorized_keys` and which have a forwarded
-agent. This response will be to insert an ssh user certificate into the
-forwarded agent which is signed by `caprivatekey` with the parameters
-set out in `settings.yaml` and restrictions as noted below.
+have a public key listed in `user_principals` section and which have a
+forwarded agent. This response will be to insert an ssh user certificate
+into the forwarded agent which is signed by `caprivatekey` with the
+parameters set out in `settings.yaml` and restrictions as noted below.
 
 The inserted certificate is generated from an ECDSA key pair with a
 P-384 curve for fast key generation.
 
 ## Certificate Restrictions
 
-The project currently has no support for host certificates.
+The project currently has no support for host certificates, although
+these could be easily added.
 
 With reference to
 https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
@@ -109,15 +109,6 @@ which you wish to grant certificate-authenticated access. For example:
 
     TrustedUserCAKeys /etc/ssh/ca.pub
 
-Where an AuthorizedPrincipalsFile must also be configured, such as:
-
-    AuthorizedPrincipalsFile /etc/ssh/ca_principals
-
-The AuthorizedPrincipalsFile contains entries for the users you wish the
-certificate to be valid for. To log in, the user is required to be
-specified in the AuthorizedPrincipalsFile, the certificate principals
-(set in the yaml file) and the user for the connecting ssh client.
-
 The use of principals to provide "zone" based access to servers is set out at
 https://engineering.fb.com/security/scalable-and-secure-access-with-ssh/ 
 
@@ -132,4 +123,4 @@ from him and others on the ssh mailing list.
 
 This project is licensed under the [MIT Licence](LICENCE).
 
-Rory Campbell-Lange 15 April 2020
+Rory Campbell-Lange 09 June 2020
