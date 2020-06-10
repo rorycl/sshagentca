@@ -14,10 +14,9 @@ import (
 
 // Serve the SSH Agent Forwarding Certificate Authority Server. The
 // server requires connections to have public keys registered in the
-// authorized keys file and user_principals fingerprints defined in
-// settings. The handleConnections goroutine prints information to the
-// the client terminal and adds a certificate to the user's ssh
-// forwarded agent.
+// user_principals settings yaml file.
+// The handleConnections goroutine prints information to the the client
+// terminal and adds a certificate to the user's ssh forwarded agent.
 // The ssh server is drawn from the example in the ssh server docs at
 // https://godoc.org/golang.org/x/crypto/ssh#ServerConn and the Scalingo
 // blog posting at
@@ -163,7 +162,7 @@ func handleChannels(chans <-chan ssh.NewChannel, user *util.UserPrincipals,
 			termWriter(term, "goodbye\n")
 			chanCloser(ch, false)
 		}
-		time.Sleep(250 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		log.Println("closing the connection")
 		sshConn.Close()
 		return
