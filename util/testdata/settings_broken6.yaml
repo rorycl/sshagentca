@@ -1,0 +1,10 @@
+# test with no users
+
+validity: 180 # 3 hours
+organisation: acmeinc
+banner: "acmeinc ssh user certificate service"
+extensions:
+    permit-agent-forwarding: ""
+    permit-port-forwarding: ""
+    permit-pty: ""
+user_principals:

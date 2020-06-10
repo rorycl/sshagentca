@@ -1,0 +1,22 @@
+# banner breaks yaml
+
+validity: 180 # 3 hours
+organisation: acmeinc
+	banner: "acmeinc ssh user certificate service"
+extensions:
+    permit-agent-forwarding: ""
+    permit-port-forwarding: ""
+    permit-pty: ""
+user_principals:
+    -
+        name: bob
+        sshpublickey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFW6D3YqRLZ/jBu8u/oQdlZ8rq1zw/CpgYAccXRWtw4erLurIZIRVsarVY/uLzEWKT+6I2yREnpQbBMfTwy9/sy+Ji4/V8xp/N2jZpOPQkmMv+2+JgQiZsHep2svpCSrjdq6iWTN87pdhX95AszI10zEcpdXSXGOQiOyU3qfhYIk9T6g/oVxNLSG/+Jp/xiWjXkKngC/ZZfV/TpeyhNhOkxe/Flu2wFIOp6hrudgVZyZt1VwU/tnbUXKjH+ab07zBkXP5xjOZGWFIce9bSR52A6B/+IcBW757HTLTb6qygQj/QeU9LSO17jWhujPDg9vXaIDW3ZpLW0L6aEjDMM4OwtNTkaWJcAfg+bjfT64fJN7uDY0hY0GZ/MQ8HCc6uesqxEVLC6NSmJ1G+qKnkiISNqNJdM8iFU7/PnLT0hTr6n44fkFezrYR76vummPd++n71E1s9wNEl57ANpVFzkDMWJJWWGkwS3kEi20RIfr8qVs24uLKm3ME/nIhy3PzHtMNH5q5ZMKHMqvJN6eMrQ/MB2/Edi7zeP2DwsATAKnw5xPUrW7zYXBwo2WxBPCX8628RhELgEI5/LoPWV2NEc6PwDBrcwMFPr/FnXX4Dp96k5vGkCHV02DoxnQzJe7sDss80eoT3fxGx4maKbNYHprBH8GcfAXq06NYmTGxxqyAtiw== test1"
+        principals:
+            - web
+
+    -
+        name: bill
+        sshpublickey: "ssh-dss AAAAB3NzaC1kc3MAAACBALOyk06qeZ7V2DvUex7b4dZ1qqPtTp8jt14P3RWlUlwuIM6HZLzl+XFLOm1gnjWguhdseZROH//SLyQu3k2jlJ04V8ueaygHfwCrELVruKfCxv5U22CsVVxBFYPCsKeUrvR2Pou0P3hxIQyDSgs+Px8WYK91tlb2CkPkvDFfrbWpAAAAFQCLNqxnj1oXAaodjpMIvCjuggkXJwAAAIEApFegHcY2QNqaKjFn0DUv/oQiZRHqrCPW/8pT6fgQiLAXrAO977XOE2Z7iyNDLcpZ7QxRF4mneraZhi2UvczYeDHx3tLfn/HIMkzBpEg16b+9B4U+Y6GUk5+9moGONVgIvyfAnOsDnKaJ02PxvwpxXVtL10jQh9FfFS3UmAj8LG0AAACAExj7fuItHCDcSmp8lHvDWoLQ0ecG0m2rCxhM9A9V0ZocutWDP28bI3P6bNjV4u93EMi9QLylLw0wedghBPUa69AAM5XGNcU35T4+rK3J+/ExrgBxe4b5IIWf3twzSAWgyUvmf7hZa4x40oME2IMVb4mR8yf+yFraj2/+PxiX2EE= rory@rory-t470s"
+        principals:
+    
+

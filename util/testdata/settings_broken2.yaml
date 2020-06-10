@@ -1,0 +1,23 @@
+# bill has an invalid ssh key
+
+validity: 180 # 3 hours
+organisation: acmeinc
+banner: "acmeinc ssh user certificate service"
+extensions:
+    permit-agent-forwarding: ""
+    permit-port-forwarding: ""
+    permit-pty: ""
+user_principals:
+    -
+        name: bob
+        sshpublickey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFW6D3YqRLZ/jBu8u/oQdlZ8rq1zw/CpgYAccXRWtw4erLurIZIRVsarVY/uLzEWKT+6I2yREnpQbBMfTwy9/sy+Ji4/V8xp/N2jZpOPQkmMv+2+JgQiZsHep2svpCSrjdq6iWTN87pdhX95AszI10zEcpdXSXGOQiOyU3qfhYIk9T6g/oVxNLSG/+Jp/xiWjXkKngC/ZZfV/TpeyhNhOkxe/Flu2wFIOp6hrudgVZyZt1VwU/tnbUXKjH+ab07zBkXP5xjOZGWFIce9bSR52A6B/+IcBW757HTLTb6qygQj/QeU9LSO17jWhujPDg9vXaIDW3ZpLW0L6aEjDMM4OwtNTkaWJcAfg+bjfT64fJN7uDY0hY0GZ/MQ8HCc6uesqxEVLC6NSmJ1G+qKnkiISNqNJdM8iFU7/PnLT0hTr6n44fkFezrYR76vummPd++n71E1s9wNEl57ANpVFzkDMWJJWWGkwS3kEi20RIfr8qVs24uLKm3ME/nIhy3PzHtMNH5q5ZMKHMqvJN6eMrQ/MB2/Edi7zeP2DwsATAKnw5xPUrW7zYXBwo2WxBPCX8628RhELgEI5/LoPWV2NEc6PwDBrcwMFPr/FnXX4Dp96k5vGkCHV02DoxnQzJe7sDss80eoT3fxGx4maKbNYHprBH8GcfAXq06NYmTGxxqyAtiw== test1"
+        principals:
+            - web
+
+    -
+        name: bill
+        sshpublickey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDHmxoABCjwmvbTakmS/tD0X4T2Zg1fGeKiJ0VmRGpmsOpA5poVHRmjkjdlGUtYkV68RSRpAZ1QnOI/GfV0EZ3CCP3zzBKn3fdUe8hAcfbghMtvOtmNXbvMaF7HANAwl8hrg75OFwqdsVzLorn+qAoq1+yaHkaWkfB6OmdnVTI2byJbNYROpjTbSbTcQKehj8HwCXM9ErzzZbNNnt0JIqMH+SJts3wkJrBZkK5msl5Gr3MT+l1zFwSe19rjBLp1YwUeUOdmZZGqPtNH4yNk9eknV5Wdt5BHAtmNlvZ0rZeBAGeliA/lPA3ZQFL2tUKxSkbZa4Y+5+8bEuLTIagXAIqF8oYYyu/cRWzQfS97BN1rqts4lzsML3agCZxlWgUtx6FkNLnXsHSNJ65xIhBRHpeKH1wneG3MUSVrQXUDdt1uRaKa0H44KgQ8Co2cFyIFDhLIxxGhuTiEbOsTVtqYcHpCSDOBENO7R/DF9939m6iDRGwSKlyutZzJZSvYsEsNmx1uwPziHPBul36c4Si+vK33+iPIcEkFKX9pZwlPsJKHeyKNxUHUpsq4BcRke/nnA2o+8rTh45DJLDRictWsZUsVf9lLYl7BRCkoxTmJiqlXkptmfsfbeRxCpZ8cI4yKQeoEPiyAXzoW9ZYWMBS5wOGDGLTggTPSYcOLDBTK/OuCd test2"
+        principals:
+            - database
+    
+
