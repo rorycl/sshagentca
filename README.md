@@ -40,6 +40,9 @@ Example client usage:
     # connect to the remote server
     ssh user@remoteserver
 
+The login username that the client provides when connecting to `sshagentca`
+is ignored - it does not have to match the `name:` in `settings.yaml`.
+
 Certificates from `sshagentca` can be conveniently used with
 [pam-ussh](https://github.com/uber/pam-ussh) to control sudo privileges
 on suitably configured servers.
@@ -47,6 +50,14 @@ on suitably configured servers.
 Please refer to the specification at PROTOCOL.certkeys at
 https://www.openssh.com/specs.html and the related go documentation at
 https://godoc.org/golang.org/x/crypto/ssh.
+
+## Building
+
+```
+go get github.com/rorycl/sshagentca
+```
+
+The binary will be installed in `~/go/bin/sshagentca` by default.
 
 ## Details
 
@@ -70,8 +81,17 @@ forwarded agent. This response will be to insert an ssh user certificate
 into the forwarded agent which is signed by `caprivatekey` with the
 parameters set out in `settings.yaml` and restrictions as noted below.
 
-The inserted certificate is generated from an ECDSA key pair with a
-P-384 curve for fast key generation.
+sshagentca generates a new key and corresponding certificate to insert into
+the client's ssh-agent.  The key is an ECDSA key pair with a P-384 curve for
+fast key generation; the CA key you provide to sign the certificate may be a
+different type (e.g. RSA).
+
+Clients can authenticate to sshagentca using any key type supported by go's
+`x/crypto/ssh` package.  This includes the ecdsa-sk key used with U2F
+security keys, introduced in OpenSSH 8.2.  Hence you can use a physical U2F
+token with an OpenSSH 8.2 client to authenticate to sshagentca, whilst the
+keys and certificates it issues can be used to login to older versions of
+sshd.
 
 ## Certificate Restrictions
 
@@ -89,7 +109,8 @@ out for the specific connecting client public key from the
 `user_principals` settings.
 
 The `valid after` timestamp is set according to the `duration` settings
-parameter, specified in minutes.
+parameter, specified in minutes.  Durations longer than 24 hours are
+rejected.
 
 ## Key generation
 
