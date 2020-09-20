@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-const VERSION = "0.0.5-beta"
+const VERSION = "0.0.6-beta"
 const usage = `<options> <yamlfile>
 
 SSHAgentCA version %s

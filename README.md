@@ -1,6 +1,6 @@
 # sshagentca
 
-version 0.0.5-beta : 09 June 2020
+version 0.0.6-beta : 20 September 2020
 
 A server to add ssh user certificates to ssh forwarded agents.
 
@@ -13,7 +13,7 @@ Running the server:
 Example client usage:
 
     # generate a new key pair, start an ssh agent and add a key
-	ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_test	
+	ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_test
     ssh-agent > ~/.ssh/agent.env
     source ~/.ssh/agent.env
     ssh-add ~/.ssh/id_test
@@ -28,14 +28,14 @@ Example client usage:
     ssh -p 2222 10.0.1.99 -A
 
     > acmecorp ssh user certificate service
-    > 
+    >
     > welcome, bob
     > certificate generation complete
     > run 'ssh-add -l' to view
     > goodbye
 
     # Put id_ca.pub in /etc/ssh/ on the remote server
-    # configure the remote server's sshd server with 
+    # configure the remote server's sshd server with
     # TrustedUserCAKeys = id_ca.pub (from above)
     # connect to the remote server
     ssh user@remoteserver
@@ -86,12 +86,13 @@ the client's ssh-agent.  The key is an ECDSA key pair with a P-384 curve for
 fast key generation; the CA key you provide to sign the certificate may be a
 different type (e.g. RSA).
 
-Clients can authenticate to sshagentca using any key type supported by go's
-`x/crypto/ssh` package.  This includes the ecdsa-sk key used with U2F
-security keys, introduced in OpenSSH 8.2.  Hence you can use a physical U2F
-token with an OpenSSH 8.2 client to authenticate to sshagentca, whilst the
-keys and certificates it issues can be used to login to older versions of
-sshd.
+Clients can authenticate to sshagentca using any key type supported by
+go's `x/crypto/ssh` package, including ed25519 keys introduced in go
+1.13.  Key type support includes the ecdsa-sk key used with U2F security
+keys, introduced in OpenSSH 8.2.  As a result, you can use a physical
+U2F token with an OpenSSH 8.2 client to authenticate to sshagentca,
+whilst the keys and certificates it issues can be used to login to older
+versions of sshd.
 
 ## Certificate Restrictions
 
@@ -108,9 +109,9 @@ Each certificate's principals settings are taken from the principals set
 out for the specific connecting client public key from the
 `user_principals` settings.
 
-The `valid after` timestamp is set according to the `duration` settings
-parameter, specified in minutes.  Durations longer than 24 hours are
-rejected.
+The `valid after` timestamp in the generated certificates is set
+according to the `validity` settings parameter, specified in minutes.
+A `validity` duration of 24 hours or more is not permitted.
 
 ## Key generation
 
@@ -131,7 +132,7 @@ which you wish to grant certificate-authenticated access. For example:
     TrustedUserCAKeys /etc/ssh/ca.pub
 
 The use of principals to provide "zone" based access to servers is set out at
-https://engineering.fb.com/security/scalable-and-secure-access-with-ssh/ 
+https://engineering.fb.com/security/scalable-and-secure-access-with-ssh/
 
 ## Thanks
 
