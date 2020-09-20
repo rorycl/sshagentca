@@ -47,12 +47,12 @@ func TestLoadRSAKeysNoPassword(t *testing.T) {
 
 	_, err = LoadPrivateKey(tname)
 	if err != nil {
-		t.Errorf("could not read private key without password: %s", err)
+		t.Errorf("could not read rsa private key without password: %s", err)
 	}
 
 	_, err = LoadPublicKey(pubkey)
 	if err != nil {
-		t.Errorf("could not read public key : %s", err)
+		t.Errorf("could not read rsa public key : %s", err)
 	}
 
 	// clean up
@@ -91,22 +91,22 @@ func TestLoadRSAKeys(t *testing.T) {
 
 	_, err = LoadPrivateKeyWithPassword(tname, password)
 	if err != nil {
-		t.Errorf("could not read private key with password: %s", err)
+		t.Errorf("could not read rsa private key with password: %s", err)
 	}
 
 	_, err = LoadPublicKey(pubkey)
 	if err != nil {
-		t.Errorf("could not read public key : %s", err)
+		t.Errorf("could not read rsa public key : %s", err)
 	}
 
 	// read the privatekey to check via bytes method
 	fkey, err := ioutil.ReadFile(tname)
 	if err != nil {
-		t.Errorf("could not read private key for parsing: %s", err)
+		t.Errorf("could not read rsa private key for parsing: %s", err)
 	}
 	_, err = LoadPrivateKeyBytesWithPassword(fkey, password)
 	if err != nil {
-		t.Errorf("could not read private key via bytes: %s", err)
+		t.Errorf("could not read rsa private key via bytes: %s", err)
 	}
 
 	// try and read the key without a password, which should fail
@@ -151,12 +151,113 @@ func TestLoadECDSAKeys(t *testing.T) {
 
 	_, err = LoadPrivateKeyWithPassword(tname, password)
 	if err != nil {
-		t.Errorf("could not read private key with password: %s", err)
+		t.Errorf("could not read ecdsa private key with password: %s", err)
+	}
+
+	_, err = LoadPublicKey(pubkey)
+	if err != nil {
+		t.Errorf("could not read ecdsa public key : %s", err)
+	}
+
+	// clean up
+	_ = os.Remove(tname)
+	_ = os.Remove(pubkey)
+
+}
+
+// test ssh ed25519 private key with no password
+func TestLoadED25519KeysNoPassword(t *testing.T) {
+
+	tmpfile, err := ioutil.TempFile("", "ed25519")
+	if err != nil {
+		t.Error(err)
+	}
+	tname := tmpfile.Name()
+	// very crude
+	os.Remove(tname)
+	pubkey := tname + ".pub"
+
+	f := fmt.Sprintf("-f %s", tname)
+	fmt.Println(f)
+
+	out, err := exec.Command(
+		"ssh-keygen",
+		"-ted25519",
+		fmt.Sprintf("-f%s", tname),
+	).Output()
+	if err != nil {
+		t.Errorf("ssh-keygen failed %s", err)
+	} else {
+		fmt.Printf("out %s", out)
+	}
+
+	_, err = LoadPrivateKey(tname)
+	if err != nil {
+		t.Errorf("could not read ed25519 private key without password: %s", err)
 	}
 
 	_, err = LoadPublicKey(pubkey)
 	if err != nil {
 		t.Errorf("could not read public key : %s", err)
+	}
+
+	// clean up
+	_ = os.Remove(tname)
+	_ = os.Remove(pubkey)
+
+}
+
+// test ssh ed25519 private key with password and public key reading
+func TestLoadED25519Keys(t *testing.T) {
+
+	tmpfile, err := ioutil.TempFile("", "ed25519")
+	if err != nil {
+		t.Error(err)
+	}
+	tname := tmpfile.Name()
+	// very crude
+	os.Remove(tname)
+	pubkey := tname + ".pub"
+
+	f := fmt.Sprintf("-f %s", tname)
+	fmt.Println(f)
+
+	out, err := exec.Command(
+		"ssh-keygen",
+		"-ted25519",
+		fmt.Sprintf("-N%s", password),
+		fmt.Sprintf("-f%s", tname),
+	).Output()
+	if err != nil {
+		t.Errorf("ssh-keygen failed %s", err)
+	} else {
+		fmt.Printf("out %s", out)
+	}
+
+	_, err = LoadPrivateKeyWithPassword(tname, password)
+	if err != nil {
+		t.Errorf("could not read ed25519 private key with password: %s", err)
+	}
+
+	_, err = LoadPublicKey(pubkey)
+	if err != nil {
+		t.Errorf("could not read ed25519 public key : %s", err)
+	}
+
+	// read the privatekey to check via bytes method
+	fkey, err := ioutil.ReadFile(tname)
+	if err != nil {
+		t.Errorf("could not read ed25519 private key for parsing: %s", err)
+	}
+	_, err = LoadPrivateKeyBytesWithPassword(fkey, password)
+	if err != nil {
+		t.Errorf("could not read ed25519 private key via bytes: %s", err)
+	}
+
+	// try and read the key without a password, which should fail
+	_, err = LoadPrivateKey(tname)
+	if err != ErrKeyPassphraseRequired {
+		t.Errorf("Unexpected error %v", err)
 	}
 
 	// clean up
