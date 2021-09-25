@@ -1,6 +1,6 @@
 module github.com/rorycl/sshagentca
 
-go 1.14
+go 1.16
 
 require (
 	github.com/jessevdk/go-flags v1.4.0
