@@ -1,30 +1,30 @@
 package main
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
+	"crypto/ed25519"
 	"crypto/rand"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/rorycl/sshagentca/util"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
-	"log"
-	"time"
 )
 
 // Given an agent, CA private key, username and some settings, generate
 // an SSH certificate and insert it in the agent.
 func addCertToAgent(agentC agent.ExtendedAgent, caKey ssh.Signer, user *util.UserPrincipals, settings util.Settings) error {
 
-	// generate a new private key for signing the certificate, and then
-	// derive the public key from it
-	privKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	// generate new keys for signing the certificate
+	pubKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
-		return fmt.Errorf("Could not generate cert private key %s", err)
+		return fmt.Errorf("could not generate ed25519 keys %s", err)
 	}
-	pubKey, err := ssh.NewPublicKey(&privKey.PublicKey)
+
+	sshPubKey, err := ssh.NewPublicKey(pubKey)
 	if err != nil {
-		return fmt.Errorf("Could not generate cert public key %s", err)
+		return fmt.Errorf("could not convert ed25519 public key to ssh key %s", err)
 	}
 
 	fromT := time.Now().UTC()
@@ -38,7 +38,7 @@ func addCertToAgent(agentC agent.ExtendedAgent, caKey ssh.Signer, user *util.Use
 
 	cert := &ssh.Certificate{
 		CertType:        ssh.UserCert,
-		Key:             pubKey,
+		Key:             sshPubKey,
 		KeyId:           identifier,
 		ValidAfter:      uint64(fromT.Unix()),
 		ValidBefore:     uint64(toT.Unix()),
