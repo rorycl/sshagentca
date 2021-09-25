@@ -52,7 +52,7 @@ Please refer to the specification at PROTOCOL.certkeys at
 https://www.openssh.com/specs.html and the related go documentation at
 https://godoc.org/golang.org/x/crypto/ssh.
 
-version 0.0.6-beta : 20 September 2020
+version 0.0.7-beta : 20 September 2021
 
 Details
 
@@ -76,10 +76,9 @@ forwarded agent. This response will be to insert an ssh user certificate
 into the forwarded agent which is signed by `caprivatekey` with the
 parameters set out in `settings.yaml` and restrictions as noted below.
 
-sshagentca generates a new key and corresponding certificate to insert into
-the client's ssh-agent.  The key is an ECDSA key pair with a P-384 curve for
-fast key generation; the CA key you provide to sign the certificate may be a
-different type (e.g. RSA).
+sshagentca generates a new key and corresponding certificate to insert
+into the client's ssh-agent, signed using ed25519 keys. The CA key you
+provide to sign the certificate may be a different key.
 
 Clients can authenticate to sshagentca using any key type supported by
 go's `x/crypto/ssh` package, including ed25519 keys introduced in go
@@ -139,7 +138,7 @@ from him and others on the ssh mailing list.
 License
 
 This project is licensed under the MIT Licence.
-Rory Campbell-Lange 09 June 2020
+Rory Campbell-Lange 25 September 2021
 
 */
 package main
