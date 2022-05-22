@@ -40,8 +40,13 @@ Example client usage:
     # connect to the remote server
     ssh user@remoteserver
 
-The login username that the client provides when connecting to `sshagentca`
-is ignored - it does not have to match the `name:` in `settings.yaml`.
+You can also use the docker file at 
+[`sshagentca-docker`](https://github.com/rorycl/sshagentca-docker) to
+try out the process.
+
+Note that the login username that the client provides when connecting to
+`sshagentca` is ignored - it does not have to match the `name:` in
+`settings.yaml`.
 
 Certificates from `sshagentca` can be conveniently used with
 [pam-ussh](https://github.com/uber/pam-ussh) to control sudo privileges
