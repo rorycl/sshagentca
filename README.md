@@ -1,6 +1,6 @@
 # sshagentca
 
-version 0.0.7-beta : 20 September 2021
+version 0.0.8-beta : 24 May 2022
 
 A server to add ssh user certificates to ssh forwarded agents.
 
