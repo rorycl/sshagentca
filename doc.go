@@ -11,35 +11,36 @@ Running the server:
     sshagentca -t <privatekey> -c <caprivatekey> -i <ipaddress> -p <port>
                <settings.yaml>
 
-Example client usage:
+Example client usage using a key pair whose public key is registered in
+the server settings.yaml (see
+https://github.com/rorycl/sshagentca-docker for a docker image to test
+this out):
 
-    # generate a new key pair, start an ssh agent and add a key
-	ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_test
-    ssh-agent > ~/.ssh/agent.env
-    source ~/.ssh/agent.env
-    ssh-add ~/.ssh/id_test
-    <enter password>
+    $ eval $(ssh-agent)
+      Agent pid 2490112
 
-    # register ~/.ssh/id_test.pub in the sshagentca settings.yaml file
-    # make a new ssh keypair for the server private key
-    # make a new ssh keypair for the server certificate authority
-    # (the ca key must be password protected)
-    # ./sshagentca -t id_pvt -c id_ca -i 10.0.1.99 settings.yaml
-    # connect to sshagentca, remembering to forward the agent
-    ssh -p 2222 10.0.1.99 -A
+    $ ssh-add briony
+      Identity added: briony (briony@test.com)
 
-    > acmecorp ssh user certificate service
-    >
-    > welcome, bob
-    > certificate generation complete
-    > run 'ssh-add -l' to view
-    > goodbye
+    $ ssh-add -l
+      256 SHA256:Ye3VV0z4vDvAuiZYqw4ji2Ht/JlDTMNlpTZoeZR+bDs briony@test.com (ED25519)
 
-    # Put id_ca.pub in /etc/ssh/ on the remote server
-    # configure the remote server's sshd server with
-    # TrustedUserCAKeys = id_ca.pub (from above)
-    # connect to the remote server
-    ssh user@remoteserver
+    $ ssh -A -p 2222 127.0.0.1
+      acmeinc ssh user certificate service
+
+      welcome, briony
+      certificate generation complete
+      run 'ssh-add -l' to view
+      goodbye
+
+    $ ssh-add -l
+      256 SHA256:Ye3VV0z4vDvAuiZYqw4ji2Ht/JlDTMNlpTZoeZR+bDs briony@test.com (ED25519)
+      256 SHA256:wfFD6xj3qGNCli3WkRda8SMbRP6WwleZWU9dt9oJDZw acmeinc_briony_from:2022-05-24T06:06_to:2022-05-24T09:06UTC (ED25519-CERT)
+
+    $ ssh -p 48084 root@127.0.0.1
+      Welcome to Alpine!
+      ...
+      fd54c3009dc2:~# exit
 
 The login username that the client provides when connecting to `sshagentca`
 is ignored - it does not have to match the `name:` in `settings.yaml`.
