@@ -88,11 +88,11 @@ provide to sign the certificate may be a different key.
 
 Clients can authenticate to sshagentca using any key type supported by
 go's `x/crypto/ssh` package, including ed25519 keys introduced in go
-1.13.  Key type support includes the ecdsa-sk key used with U2F security
-keys, introduced in OpenSSH 8.2.  As a result, you can use a physical
-U2F token with an OpenSSH 8.2 client to authenticate to sshagentca,
-whilst the keys and certificates it issues can be used to login to older
-versions of sshd.
+1.13. Key types supported include the ecdsa-sk key used with U2F
+security keys, introduced in OpenSSH 8.2. As a result, you should be
+able to use a physical U2F token with an OpenSSH 8.2 client to
+authenticate to sshagentca, whilst the keys and certificates it issues
+can be used to login to older versions of sshd.
 
 ## Certificate Restrictions
 
@@ -145,4 +145,4 @@ from him and others on the ssh mailing list.
 
 This project is licensed under the [MIT Licence](LICENCE).
 
-Rory Campbell-Lange 25 September 2021
+Rory Campbell-Lange

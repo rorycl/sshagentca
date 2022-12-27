@@ -2,13 +2,15 @@ package util
 
 import (
 	"errors"
-	"golang.org/x/crypto/ssh"
 	"io/ioutil"
+
+	"golang.org/x/crypto/ssh"
 )
 
+// ErrKeyPassphraseRequired is a sentinel error for missing passphrases
 var ErrKeyPassphraseRequired = errors.New("the ssh key requires a passphrase")
 
-// load a private key from file (best not to use)
+// LoadPrivateKey loads a private key from file (best not to use)
 func LoadPrivateKey(filename string) (ssh.Signer, error) {
 
 	fkey, err := ioutil.ReadFile(filename)
@@ -27,7 +29,7 @@ func LoadPrivateKey(filename string) (ssh.Signer, error) {
 	return sig, nil
 }
 
-// load a private key with password from file
+// LoadPrivateKeyWithPassword loads a private key with password from file
 func LoadPrivateKeyWithPassword(filename string, passphrase []byte) (ssh.Signer, error) {
 
 	fkey, err := ioutil.ReadFile(filename)
@@ -41,7 +43,7 @@ func LoadPrivateKeyWithPassword(filename string, passphrase []byte) (ssh.Signer,
 	return sig, nil
 }
 
-// load a private key with password from bytes
+// LoadPrivateKeyBytesWithPassword loads a private key with password from bytes
 func LoadPrivateKeyBytesWithPassword(keyBytes []byte, passphrase []byte) (ssh.Signer, error) {
 
 	sig, err := ssh.ParsePrivateKeyWithPassphrase(keyBytes, passphrase)
@@ -51,7 +53,7 @@ func LoadPrivateKeyBytesWithPassword(keyBytes []byte, passphrase []byte) (ssh.Si
 	return sig, nil
 }
 
-// load a public key from file
+// LoadPublicKey loads a public key from file
 func LoadPublicKey(filename string) (ssh.PublicKey, error) {
 
 	fkey, err := ioutil.ReadFile(filename)
@@ -65,7 +67,7 @@ func LoadPublicKey(filename string) (ssh.PublicKey, error) {
 	return pubKey, nil
 }
 
-// load a public key from bytes
+// LoadPublicKeyBytes loads a public key from bytes
 func LoadPublicKeyBytes(key []byte) (ssh.PublicKey, error) {
 	pubKey, _, _, _, err := ssh.ParseAuthorizedKey(key)
 	if err != nil {
@@ -74,7 +76,7 @@ func LoadPublicKeyBytes(key []byte) (ssh.PublicKey, error) {
 	return pubKey, nil
 }
 
-// load authorized_keys from file
+// LoadAuthorizedKeys loads authorized_keys from file
 func LoadAuthorizedKeys(filename string) (map[ssh.PublicKey]bool, error) {
 
 	// record the found authorized keys

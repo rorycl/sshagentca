@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"os"
+
 	flags "github.com/jessevdk/go-flags"
 	"github.com/rorycl/sshagentca/util"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
-	"net"
-	"os"
 )
 
+// VERSION is the version of sshagentca
 const VERSION = "0.0.6-beta"
 const usage = `<options> <yamlfile>
 
@@ -29,7 +31,7 @@ Application Arguments:
 
  `
 
-// flag options
+// Options are the command line options
 type Options struct {
 	PrivateKey   string `short:"t" long:"privateKey" required:"true" description:"server ssh private key (optionally password protected)"`
 	CAPrivateKey string `short:"c" long:"caPrivateKey" description:"certificate authority private key file (password protected)"`
@@ -53,6 +55,9 @@ func main() {
 	parser.Usage = fmt.Sprintf(usage, VERSION)
 
 	if _, err = parser.Parse(); err != nil {
+		if !flags.WroteHelp(err) {
+			parser.WriteHelp(os.Stdout)
+		}
 		os.Exit(1)
 	}
 

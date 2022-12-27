@@ -298,8 +298,8 @@ func TestAuthorizedKeysOne(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	authorized_keys, err := LoadAuthorizedKeys(af.Name())
-	if len(authorized_keys) != 1 {
+	authorizedKeys, err := LoadAuthorizedKeys(af.Name())
+	if len(authorizedKeys) != 1 {
 		t.Error("number of authorized keys should be one")
 	}
 	os.Remove(af.Name())
@@ -313,8 +313,8 @@ ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIfis9M2
 	if err != nil {
 		t.Error(err)
 	}
-	authorized_keys, err := LoadAuthorizedKeys(af.Name())
-	if len(authorized_keys) != 2 {
+	authorizedKeys, err := LoadAuthorizedKeys(af.Name())
+	if len(authorizedKeys) != 2 {
 		t.Error("number of authorized keys should be two")
 	}
 	os.Remove(af.Name())

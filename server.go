@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/rorycl/sshagentca/util"
-	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/agent"
-	"golang.org/x/crypto/ssh/terminal"
 	"log"
 	"net"
 	"strings"
 	"time"
+
+	"github.com/rorycl/sshagentca/util"
+	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 // Serve the SSH Agent Forwarding Certificate Authority Server. The
@@ -42,12 +43,12 @@ func Serve(options Options, privateKey ssh.Signer, caKey ssh.Signer, settings ut
 
 	// setup net listener
 	log.Printf("\n\nStarting server connection for %s...", settings.Organisation)
-	addr_port := strings.Join([]string{options.IPAddress, options.Port}, ":")
-	listener, err := net.Listen("tcp", addr_port)
+	addrPort := strings.Join([]string{options.IPAddress, options.Port}, ":")
+	listener, err := net.Listen("tcp", addrPort)
 	if err != nil {
-		log.Fatalf("Failed to listen on %s", addr_port)
+		log.Fatalf("Failed to listen on %s", addrPort)
 	} else {
-		log.Printf("Listening on %s", addr_port)
+		log.Printf("Listening on %s", addrPort)
 	}
 
 	for {

@@ -4,7 +4,8 @@ import (
 	"strings"
 )
 
-// https://stackoverflow.com/a/55803656
+// ErrorContains checks error contents
+// see https://stackoverflow.com/a/55803656
 func ErrorContains(out error, want string) bool {
 	if out == nil {
 		return want == ""

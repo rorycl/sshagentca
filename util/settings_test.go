@@ -4,8 +4,9 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"golang.org/x/crypto/ssh"
 	"testing"
+
+	"golang.org/x/crypto/ssh"
 )
 
 func TestSettingsParse(t *testing.T) {
