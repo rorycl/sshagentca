@@ -1,46 +1,46 @@
 /*
 sshagentca is an ssh server forwarded agent certificate authority
 
-Summary
+# Summary
 
 A server to add ssh user certificates to ssh forwarded agents.
 
 Running the server:
 
-    sshagentca -h
-    sshagentca -t <privatekey> -c <caprivatekey> -i <ipaddress> -p <port>
-               <settings.yaml>
+	sshagentca -h
+	sshagentca -t <privatekey> -c <caprivatekey> -i <ipaddress> -p <port>
+	           <settings.yaml>
 
 Example client usage using a key pair whose public key is registered in
 the server settings.yaml (see
 https://github.com/rorycl/sshagentca-docker for a docker image to test
 this out):
 
-    $ eval $(ssh-agent)
-      Agent pid 2490112
+	$ eval $(ssh-agent)
+	  Agent pid 2490112
 
-    $ ssh-add briony
-      Identity added: briony (briony@test.com)
+	$ ssh-add briony
+	  Identity added: briony (briony@test.com)
 
-    $ ssh-add -l
-      256 SHA256:Ye3VV0z4vDvAuiZYqw4ji2Ht/JlDTMNlpTZoeZR+bDs briony@test.com (ED25519)
+	$ ssh-add -l
+	  256 SHA256:Ye3VV0z4vDvAuiZYqw4ji2Ht/JlDTMNlpTZoeZR+bDs briony@test.com (ED25519)
 
-    $ ssh -A -p 2222 127.0.0.1
-      acmeinc ssh user certificate service
+	$ ssh -A -p 2222 127.0.0.1
+	  acmeinc ssh user certificate service
 
-      welcome, briony
-      certificate generation complete
-      run 'ssh-add -l' to view
-      goodbye
+	  welcome, briony
+	  certificate generation complete
+	  run 'ssh-add -l' to view
+	  goodbye
 
-    $ ssh-add -l
-      256 SHA256:Ye3VV0z4vDvAuiZYqw4ji2Ht/JlDTMNlpTZoeZR+bDs briony@test.com (ED25519)
-      256 SHA256:wfFD6xj3qGNCli3WkRda8SMbRP6WwleZWU9dt9oJDZw acmeinc_briony_from:2022-05-24T06:06_to:2022-05-24T09:06UTC (ED25519-CERT)
+	$ ssh-add -l
+	  256 SHA256:Ye3VV0z4vDvAuiZYqw4ji2Ht/JlDTMNlpTZoeZR+bDs briony@test.com (ED25519)
+	  256 SHA256:wfFD6xj3qGNCli3WkRda8SMbRP6WwleZWU9dt9oJDZw acmeinc_briony_from:2022-05-24T06:06_to:2022-05-24T09:06UTC (ED25519-CERT)
 
-    $ ssh -p 48084 root@127.0.0.1
-      Welcome to Alpine!
-      ...
-      fd54c3009dc2:~# exit
+	$ ssh -p 48084 root@127.0.0.1
+	  Welcome to Alpine!
+	  ...
+	  fd54c3009dc2:~# exit
 
 The login username that the client provides when connecting to `sshagentca`
 is ignored - it does not have to match the `name:` in `settings.yaml`.
@@ -55,7 +55,7 @@ https://godoc.org/golang.org/x/crypto/ssh.
 
 version 0.0.7-beta : 20 September 2021
 
-Details
+# Details
 
 The server requires an ssh private key and ssh certificate authority
 (CA) private key, with a password required for the CA key at least.
@@ -112,34 +112,33 @@ A `validity` duration of 24 hours or more is not permitted.
 
 To generate new server keys, refer to man ssh-keygen. For example:
 
-    ssh-keygen -t rsa -b 4096 -f id_server
+	ssh-keygen -t rsa -b 4096 -f id_server
 
 and specify a password. The id_server file is the private key. Certificate
 authority keys are generated in the same way, although adding a comment is often
 considered sensible for CA key management, e.g.:
 
-    ssh-keygen -t rsa -b 4096 -f ca -C "CA for example.com"
+	ssh-keygen -t rsa -b 4096 -f ca -C "CA for example.com"
 
 and choose a password. The ca file is the private key. The ca.pub key in
 this example should be used in the sshd_config file on any server for
 which you wish to grant certificate-authenticated access. For example:
 
-    TrustedUserCAKeys /etc/ssh/ca.pub
+	TrustedUserCAKeys /etc/ssh/ca.pub
 
 The use of principals to provide "zone" based access to servers is set out at
 https://engineering.fb.com/security/scalable-and-secure-access-with-ssh/
 
-Thanks
+# Thanks
 
 Thanks to Peter Moody for his pam-ussh announcement at
 https://medium.com/uber-security-privacy/introducing-the-uber-ssh-certificate-authority-4f840839c5cc
 which was the inspiration for this project, and the comments and help
 from him and others on the ssh mailing list.
 
-License
+# License
 
 This project is licensed under the MIT Licence.
 Rory Campbell-Lange 25 September 2021
-
 */
 package main
