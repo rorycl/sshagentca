@@ -2,7 +2,6 @@ package util
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"runtime"
@@ -21,7 +20,7 @@ var password = []byte("akdjfN57$")
 // test ssh rsa private key with no password
 func TestLoadRSAKeysNoPassword(t *testing.T) {
 
-	tmpfile, err := ioutil.TempFile("", "rsa")
+	tmpfile, err := os.CreateTemp("", "rsa")
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,7 +63,7 @@ func TestLoadRSAKeysNoPassword(t *testing.T) {
 // test ssh rsa private key with password and public key reading
 func TestLoadRSAKeys(t *testing.T) {
 
-	tmpfile, err := ioutil.TempFile("", "rsa")
+	tmpfile, err := os.CreateTemp("", "rsa")
 	if err != nil {
 		t.Error(err)
 	}
@@ -100,7 +99,7 @@ func TestLoadRSAKeys(t *testing.T) {
 	}
 
 	// read the privatekey to check via bytes method
-	fkey, err := ioutil.ReadFile(tname)
+	fkey, err := os.ReadFile(tname)
 	if err != nil {
 		t.Errorf("could not read rsa private key for parsing: %s", err)
 	}
@@ -124,7 +123,7 @@ func TestLoadRSAKeys(t *testing.T) {
 // test ssh ecdsa private key with password and public key reading
 func TestLoadECDSAKeys(t *testing.T) {
 
-	tmpfile, err := ioutil.TempFile("", "ecdsa")
+	tmpfile, err := os.CreateTemp("", "ecdsa")
 	if err != nil {
 		t.Error(err)
 	}
@@ -168,7 +167,7 @@ func TestLoadECDSAKeys(t *testing.T) {
 // test ssh ed25519 private key with no password
 func TestLoadED25519KeysNoPassword(t *testing.T) {
 
-	tmpfile, err := ioutil.TempFile("", "ed25519")
+	tmpfile, err := os.CreateTemp("", "ed25519")
 	if err != nil {
 		t.Error(err)
 	}
@@ -210,7 +209,7 @@ func TestLoadED25519KeysNoPassword(t *testing.T) {
 // test ssh ed25519 private key with password and public key reading
 func TestLoadED25519Keys(t *testing.T) {
 
-	tmpfile, err := ioutil.TempFile("", "ed25519")
+	tmpfile, err := os.CreateTemp("", "ed25519")
 	if err != nil {
 		t.Error(err)
 	}
@@ -245,7 +244,7 @@ func TestLoadED25519Keys(t *testing.T) {
 	}
 
 	// read the privatekey to check via bytes method
-	fkey, err := ioutil.ReadFile(tname)
+	fkey, err := os.ReadFile(tname)
 	if err != nil {
 		t.Errorf("could not read ed25519 private key for parsing: %s", err)
 	}
@@ -268,12 +267,12 @@ func TestLoadED25519Keys(t *testing.T) {
 
 func writeToFile(content string) (*os.File, error) {
 
-	tmpfile, err := ioutil.TempFile("", "authorized_keys")
+	tmpfile, err := os.CreateTemp("", "authorized_keys")
 	if err != nil {
 		return nil, err
 	}
-	tmpfile.WriteString(content)
-	return tmpfile, nil
+	_, err = tmpfile.WriteString(content)
+	return tmpfile, err
 }
 
 // test empty authorized key file
@@ -299,6 +298,9 @@ func TestAuthorizedKeysOne(t *testing.T) {
 		t.Error(err)
 	}
 	authorizedKeys, err := LoadAuthorizedKeys(af.Name())
+	if err != nil {
+		t.Error(err)
+	}
 	if len(authorizedKeys) != 1 {
 		t.Error("number of authorized keys should be one")
 	}
@@ -314,6 +316,9 @@ ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIfis9M2
 		t.Error(err)
 	}
 	authorizedKeys, err := LoadAuthorizedKeys(af.Name())
+	if err != nil {
+		t.Error(err)
+	}
 	if len(authorizedKeys) != 2 {
 		t.Error("number of authorized keys should be two")
 	}

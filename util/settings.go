@@ -110,7 +110,7 @@ func SettingsLoad(yamlFilePath string) (Settings, error) {
 
 // UserByFingerprint extracts a user's UserPrincipals struct by public key fingerprint
 func (s *Settings) UserByFingerprint(fp string) (*UserPrincipals, error) {
-	var up = &UserPrincipals{}
+	// up is a &UserPrincipals
 	up, ok := s.usersByFingerprint[fp]
 	if !ok {
 		return up, fmt.Errorf("user for public key %s not found", fp)

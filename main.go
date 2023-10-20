@@ -71,7 +71,7 @@ func main() {
 
 		// retry with password
 	} else if err == util.ErrKeyPassphraseRequired {
-		var pvtPW = []byte{}
+		var pvtPW []byte
 		pvtPWstr := os.Getenv("SSHAGENTCA_PVT_KEY")
 		if pvtPWstr != "" {
 			pvtPW = []byte(pvtPWstr)
@@ -87,12 +87,11 @@ func main() {
 		if err != nil {
 			hardexit(fmt.Sprintf("Private key could not be loaded, %s", err))
 		}
-		pvtPW = nil
 	}
 
 	// load certificate authority private key
 	var caKey ssh.Signer
-	var caPW = []byte{}
+	var caPW []byte
 	caPWstr := os.Getenv("SSHAGENTCA_CA_KEY")
 	if caPWstr != "" {
 		caPW = []byte(caPWstr)
@@ -108,7 +107,6 @@ func main() {
 	if err != nil {
 		hardexit(fmt.Sprintf("CA Private key could not be loaded, %s", err))
 	}
-	caPW = nil
 
 	// load settings yaml file
 	settings, err := util.SettingsLoad(options.Args.Settings)

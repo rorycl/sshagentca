@@ -60,7 +60,7 @@ func Serve(options Options, privateKey ssh.Signer, caKey ssh.Signer, settings ut
 		}
 
 		// provide handshake
-		sshConn, chans, reqs, err := ssh.NewServerConn(tcpConn, sshConfig)
+		sshConn, chans, _, err := ssh.NewServerConn(tcpConn, sshConfig)
 		if err != nil {
 			log.Printf("failed to handshake (%s)", err)
 			continue
@@ -104,7 +104,7 @@ func chanCloser(c ssh.Channel, isError bool) {
 	var status = struct {
 		Status uint32
 	}{uint32(0)}
-	if isError == true {
+	if isError {
 		status.Status = 1
 	}
 	// https://godoc.org/golang.org/x/crypto/ssh#Channel
@@ -124,22 +124,25 @@ func handleChannels(chans <-chan ssh.NewChannel, user *util.UserPrincipals,
 
 	for thisChan := range chans {
 		if thisChan.ChannelType() != "session" {
-			thisChan.Reject(ssh.Prohibited, "channel type is not a session")
+			_ = thisChan.Reject(ssh.Prohibited, "channel type is not a session")
 			return
 		}
 
 		// accept channel
 		ch, reqs, err := thisChan.Accept()
-		defer ch.Close()
 		if err != nil {
 			log.Println("did not accept channel request", err)
 			return
 		}
+		defer ch.Close()
 
 		// only respond to "exec" type requests
 		req := <-reqs
 		if req.Type != "auth-agent-req@openssh.com" {
-			ch.Write([]byte("request type not supported\n"))
+			_, err = ch.Write([]byte("request type not supported\n"))
+			if err != nil {
+				log.Printf("channel write error for invalid request type %v", err)
+			}
 			return
 		}
 
@@ -166,6 +169,5 @@ func handleChannels(chans <-chan ssh.NewChannel, user *util.UserPrincipals,
 		time.Sleep(500 * time.Millisecond)
 		log.Println("closing the connection")
 		sshConn.Close()
-		return
 	}
 }
