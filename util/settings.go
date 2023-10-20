@@ -3,7 +3,7 @@ package util
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"golang.org/x/crypto/ssh"
 	yaml "gopkg.in/yaml.v3"
@@ -85,7 +85,7 @@ func SettingsLoad(yamlFilePath string) (Settings, error) {
 
 	var s = Settings{}
 
-	filer, err := ioutil.ReadFile(yamlFilePath)
+	filer, err := os.ReadFile(yamlFilePath)
 	if err != nil {
 		return s, err
 	}

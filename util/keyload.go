@@ -2,7 +2,7 @@ package util
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -13,7 +13,7 @@ var ErrKeyPassphraseRequired = errors.New("the ssh key requires a passphrase")
 // LoadPrivateKey loads a private key from file (best not to use)
 func LoadPrivateKey(filename string) (ssh.Signer, error) {
 
-	fkey, err := ioutil.ReadFile(filename)
+	fkey, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func LoadPrivateKey(filename string) (ssh.Signer, error) {
 // LoadPrivateKeyWithPassword loads a private key with password from file
 func LoadPrivateKeyWithPassword(filename string, passphrase []byte) (ssh.Signer, error) {
 
-	fkey, err := ioutil.ReadFile(filename)
+	fkey, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func LoadPrivateKeyBytesWithPassword(keyBytes []byte, passphrase []byte) (ssh.Si
 // LoadPublicKey loads a public key from file
 func LoadPublicKey(filename string) (ssh.PublicKey, error) {
 
-	fkey, err := ioutil.ReadFile(filename)
+	fkey, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func LoadAuthorizedKeys(filename string) (map[ssh.PublicKey]bool, error) {
 	akeys := map[ssh.PublicKey]bool{}
 
 	// from https://godoc.org/golang.org/x/crypto/ssh#ex-NewServerConn
-	authorizedKeysBytes, err := ioutil.ReadFile(filename)
+	authorizedKeysBytes, err := os.ReadFile(filename)
 	if err != nil {
 		return akeys, err
 	}

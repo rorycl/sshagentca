@@ -10,7 +10,7 @@ import (
 	"github.com/rorycl/sshagentca/util"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // Serve the SSH Agent Forwarding Certificate Authority Server. The
@@ -95,7 +95,7 @@ func Serve(options Options, privateKey ssh.Signer, caKey ssh.Signer, settings ut
 }
 
 // write to the connection terminal, ignoring errors
-func termWriter(t *terminal.Terminal, s string) {
+func termWriter(t *term.Terminal, s string) {
 	_, _ = t.Write([]byte(s + "\n"))
 }
 
@@ -144,7 +144,7 @@ func handleChannels(chans <-chan ssh.NewChannel, user *util.UserPrincipals,
 		}
 
 		// terminal
-		term := terminal.NewTerminal(ch, "")
+		term := term.NewTerminal(ch, "")
 		termWriter(term, settings.Banner)
 		termWriter(term, fmt.Sprintf("welcome, %s", user.Name))
 

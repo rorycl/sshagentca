@@ -8,7 +8,7 @@ import (
 	flags "github.com/jessevdk/go-flags"
 	"github.com/rorycl/sshagentca/util"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // VERSION is the version of sshagentca
@@ -78,7 +78,7 @@ func main() {
 			_ = os.Unsetenv("SSHAGENTCA_PVT_KEY")
 		} else {
 			fmt.Printf("\nServer private key password: ")
-			pvtPW, err = terminal.ReadPassword(0)
+			pvtPW, err = term.ReadPassword(0)
 			if err != nil {
 				hardexit(fmt.Sprintf("Could not read password: %s", err))
 			}
@@ -99,7 +99,7 @@ func main() {
 		_ = os.Unsetenv("SSHAGENTCA_CA_KEY")
 	} else {
 		fmt.Printf("\nCertificate Authority private key password: ")
-		caPW, err = terminal.ReadPassword(0)
+		caPW, err = term.ReadPassword(0)
 		if err != nil {
 			hardexit(fmt.Sprintf("Could not read password: %s", err))
 		}
