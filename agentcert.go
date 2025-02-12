@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "crypto/ecdh"
 	"crypto/ed25519"
 	"crypto/rand"
 	"fmt"

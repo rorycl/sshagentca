@@ -1,0 +1,60 @@
+# sshagentca example settings file
+
+# certificate validity period in minutes periods of more than 24 hours are
+# not permitted by this implementation. certificates with the 'forever'
+# validity string are also not supported.
+# validity: 180 # 3 hours
+validity: 90 # 20 mins
+
+# organisation name, used in certificate identifer (which shows in
+# /var/log/auth.log on debian derivate hosts authorising user certificates; also
+# shows in `ssh-agent -l` on user hosts
+organisation: acmeinc
+
+# banner, used to greet connecting users
+banner: |
+    acmeinc ssh user certificate service
+
+# extensions, certificate "allow" extensions as set out in "Extensions" at
+# https://cvsweb.openbsd.org/src/usr.bin/ssh/PROTOCOL.certkeys?annotate=HEAD
+# these set the permissions given to users connecting to remote servers
+# whose connections are authorised by this service.
+extensions:
+    # "no-presence-required": "", // only U2F/Fido, not supported here
+    permit-agent-forwarding: ""
+    permit-port-forwarding: ""
+    permit-pty: ""
+    # permit-X11-forwarding: ""
+    # permit-user-rc: ""
+
+# user_principals, a list of configuration blocks by user, with name,
+# ssh key fingerprint and the principals to be inserted in the
+# certificate. To be valid, the fingerprints must exist in the
+# authorized_keys file provided to the program. This structure can also
+# be used to allow someone to have two key registrations to receive
+# different principal assignments Note that zero-length principals are
+# valid for *any* username (and are therefore not supported).
+# Fingerprints are ssh key sha256 hashes fingerprints which can be
+# listed by ssh-keygen -l -f <filename> on recent versions of
+# ssh-keygen.
+user_principals:
+    -
+        name: jane
+        sshpublickey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFW6D3YqRLZ/jBu8u/oQdlZ8rq1zw/CpgYAccXRWtw4erLurIZIRVsarVY/uLzEWKT+6I2yREnpQbBMfTwy9/sy+Ji4/V8xp/N2jZpOPQkmMv+2+JgQiZsHep2svpCSrjdq6iWTN87pdhX95AszI10zEcpdXSXGOQiOyU3qfhYIk9T6g/oVxNLSG/+Jp/xiWjXkKngC/ZZfV/TpeyhNhOkxe/Flu2wFIOp6hrudgVZyZt1VwU/tnbUXKjH+ab07zBkXP5xjOZGWFIce9bSR52A6B/+IcBW757HTLTb6qygQj/QeU9LSO17jWhujPDg9vXaIDW3ZpLW0L6aEjDMM4OwtNTkaWJcAfg+bjfT64fJN7uDY0hY0GZ/MQ8HCc6uesqxEVLC6NSmJ1G+qKnkiISNqNJdM8iFU7/PnLT0hTr6n44fkFezrYR76vummPd++n71E1s9wNEl57ANpVFzkDMWJJWWGkwS3kEi20RIfr8qVs24uLKm3ME/nIhy3PzHtMNH5q5ZMKHMqvJN6eMrQ/MB2/Edi7zeP2DwsATAKnw5xPUrW7zYXBwo2WxBPCX8628RhELgEI5/LoPWV2NEc6PwDBrcwMFPr/FnXX4Dp96k5vGkCHV02DoxnQzJe7sDss80eoT3fxGx4maKbNYHprBH8GcfAXq06NYmTGxxqyAtiw== test1"
+        principals:
+            - web
+            - database
+            - root
+
+    -
+        name: john
+        sshpublickey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDHmxoABCjwmvbTakmS/tD0X4T2Zg1fGeKiJ0VmRGpmsOpA5poVHRmjkjdlGUtYkV68RSRpAZ1QnOI/GfV0EZ3CCP3zzBKn3fdUe8hAcfbghMtvOtmNXbvMaF7HANAwl8hrg75OFwqdsVzLorn+qAoq1+yaHkaWkfB6OmdnVTI2byJbNYROpjTbSbTcQKehj8HwCXM9ErzzZbNNnt0JIqMH+SJts3wkJrBZkK5msl5Gr3MT+l1zFwSe19rjBLp1YwUeUOdmZZGqPtNH4yNk9eknV5Wdt5BHAtmNlvZ0rZeBAGeliA/lPA3ZQFL2tUKxSkbZa4Y+5+8bEuLTIagXAIqF8oYYyu/cRWzQfS97BN1rqts4lzsML3agCZxlWgUtx6FkNLnXsHSNJ65xIhBRHpeKH1wneG3MUSVrQXUDdt1uRaKa0H44KgQ8Co2cFyIFDhLIxxGhuTiEbOsTVtqYcHpCSDOBENO7R/DF9939m6iDRGwSKlyutZzJZSvYsEsNmx1uwPziHPBul36c4Si+vK33+iPIcEkFKX9pZwlPsJKHeyKNxUHUpsq4BcRke/nnA2o+8rTh45DJLDRictWsZUsVf9lLYl7BRCkoxTmJiqlXkptmfsfbeRxCpZ8cI4yKQeoEPiyAXzoW9ZYWMBS5wOGDGLTggTPSYcOLDBTK/OuCdQ== test2"
+        principals:
+            - web
+            - database
+
+    -
+        name: briony
+        sshpublickey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHbnCfkNiWUUMUcudbFVHU1pefuFfmz8gbtTMVA0hdWD briony@test.com"
+        principals:
+            - root
