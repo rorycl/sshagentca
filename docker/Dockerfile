@@ -2,7 +2,7 @@
 # https://github.com/rorycl/sshagentca
 # RoryCL 21 May 2022
 
-FROM golang:1.22-alpine
+FROM golang:1.25.1-alpine
 
 # add ssh-keygen
 RUN apk add --no-cache --update openssh-keygen && \
@@ -20,7 +20,7 @@ RUN git clone https://github.com/rorycl/sshagentca.git ./ && \
 # setup the go environment; note gcc isn't in alpine
 ENV CGO_ENABLED=0
 RUN go mod download && \
-    go get -d -v ./... && \
+    go get -u ./... && \
     go test ./... && \
     go build
 
@@ -58,6 +58,9 @@ RUN ssh-keygen -A && \
 
 # enable root user for login
 RUN sed -i s/root:!/"root:*"/g /etc/shadow
+
+# show a message on login to the 48084 actual server
+RUN echo -e "\n~~~\nWelcome to the ACME Inc. certificate protected ssh server!\n~~~\n" > /etc/motd
 
 EXPOSE 2222 48084
 
