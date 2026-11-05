@@ -1,8 +1,7 @@
-# for sshagentca version 0.0.7-beta : September 2021
-# https://github.com/rorycl/sshagentca
-# RoryCL 21 May 2022
+# for sshagentca https://github.com/rorycl/sshagentca
 
-FROM golang:1.25.1-alpine
+# note that prior to 05 November 2026 there is a critical bug in alpine ssh
+FROM golang:1.27-alpine
 
 # add ssh-keygen
 RUN apk add --no-cache --update openssh-keygen && \
